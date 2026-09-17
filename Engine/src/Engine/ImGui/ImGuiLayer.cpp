@@ -56,6 +56,16 @@ namespace Engine
 		ImGui::DestroyContext();
 	}
 
+	void ImGuiLayer::OnEvent(Event& _e)
+	{
+		if (m_BlockEvents)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			_e.Handled |= _e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			_e.Handled |= _e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+		}
+	}
+
 	void ImGuiLayer::Begin()
 	{
 		ImGui_ImplOpenGL3_NewFrame();

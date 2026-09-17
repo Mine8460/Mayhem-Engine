@@ -23,11 +23,13 @@ namespace Engine
 
 		void OnEvent(Event& _e);
 
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+
 		void PushLayer(Layer* _layer);
 		void PushOverlay(Layer* _overlay);
 
 		inline Window& GetWindow() { return *m_Window; }
-		inline static Application& Get() { return *s_Instance;  }
+		inline static Application& Get() { return *s_Instance; }
 	private:
 		bool OnWindowClosed(WindowCloseEvent& _e);
 		bool OnWindowResize(WindowResizeEvent& _e);

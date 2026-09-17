@@ -2,6 +2,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <imgui/imgui.h>
+#include <entt.hpp>
+
+
 
 #define PROFILE_FUNCTION(name) Timer timer##__LINE__(name, [&](ProfileResult _result) {m_ProfileResults.push_back(_result); })
 
@@ -60,6 +63,56 @@ namespace Engine
 		spec.Height = 720;
 
 		m_FrameBuffer = FrameBuffer::Create(spec);
+
+		m_ActiveScene = MakeRef<Scene>();
+
+		class CameraController : public ScriptableEntity
+		{
+		public:
+			virtual void OnCreate() override
+			{
+
+			}
+
+			virtual void OnDestroy() override
+			{
+
+			}
+
+			virtual void OnUpdate(Timestep _ts) override
+			{
+				TransformComponent& trans = GetComponent<TransformComponent>();
+
+				float camSpeed = 1.f * GetComponent<CameraComponent>().m_Camera.GetOrthographicSize();
+				float dt = _ts.GetSeconds();
+
+				if (Input::IsKeyPressed(ENGINE_KEY_A))
+					trans.m_Translation.x -= camSpeed * dt;
+
+				if (Input::IsKeyPressed(ENGINE_KEY_D))
+					trans.m_Translation.x += camSpeed * dt;
+
+				if (Input::IsKeyPressed(ENGINE_KEY_S))
+					trans.m_Translation.y -= camSpeed * dt;
+
+				if (Input::IsKeyPressed(ENGINE_KEY_W))
+					trans.m_Translation.y += camSpeed * dt;
+			}
+		};
+
+		Entity camera = m_ActiveScene->CreateEntity("Main camera");
+		camera.AddComponent<CameraComponent>();
+		camera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+
+		Entity square = m_ActiveScene->CreateEntity("Red square");
+		SpriteRenderer& sprite = square.AddComponent<SpriteRenderer>(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
+		sprite.ChangeTexture(m_Texture);
+
+		square = m_ActiveScene->CreateEntity("White square");
+		sprite = square.AddComponent<SpriteRenderer>(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		sprite.ChangeTexture(m_Texture);
+
+		m_Hierarchy.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -68,28 +121,34 @@ namespace Engine
 
 	void EditorLayer::OnUpdate(Timestep _timestep)
 	{
-		PROFILE_FUNCTION("Sandbox2D::OnUpdate");
+		PROFILE_FUNCTION("Editor::OnUpdate");
+
+		// Resize
+		FrameBufferSpecification spec = m_FrameBuffer->GetSpecification();
+		if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
+			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+		{
+			m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_CameraController->OnResize(m_ViewportSize.x, m_ViewportSize.y);
+
+			m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		}
+
+
 		// Update
-		m_CameraController->OnUpdate(_timestep);
+		if (m_ViewportFocused)
+			m_CameraController->OnUpdate(_timestep);
 
 		// Statistics
 		Renderer2D::ResetStats();
 		// Render
 		{
-			static float rotation = 0.0f;
-			rotation += _timestep.GetSeconds() * 50.0f;
-
-
-
-			PROFILE_FUNCTION("Sandbox2D::OnRender");
+			PROFILE_FUNCTION("Editor::OnRender");
 			m_FrameBuffer->Bind();
-			RenderCommand::Clear(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-			Renderer2D::BeginScene(m_CameraController->GetCamera());
 
-			Renderer2D::DrawQuad({ 0.f,0.f }, { 0.9f, 0.9f }, m_Sprites[spriteToUse], glm::vec4(1.0f), 1.f);
-			Renderer2D::DrawQuad({ 1.f,0.f }, { 0.9f, 0.9f }, m_Texture, glm::vec4(1.0f), 1.f);
+			// Update Scene
+			m_ActiveScene->OnUpdate(_timestep);
 
-			Renderer2D::EndScene();
 			m_FrameBuffer->Unbind();
 		}
 	}
@@ -170,24 +229,16 @@ namespace Engine
 			ImGui::EndMenuBar();
 		}
 
+		m_Hierarchy.OnImGuiRender();
 
-		ImGui::Begin("Settings");
-
-		ImGui::SliderInt("Sprite", &spriteToUse, 1, m_Sprites.size() - 2);
-
-		ImGui::End();
 		ImGui::Begin("Profiling");
-
 		Renderer2D::Statistics stats = Renderer2D::GetStats();
-
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-
 		ImGui::Separator();
-
 		for (ProfileResult& result : m_ProfileResults)
 		{
 			char label[75];
@@ -195,20 +246,16 @@ namespace Engine
 			strcat(label, result.Name);
 			ImGui::Text(label, result.Time);
 		}
-
 		m_ProfileResults.clear();
-
+		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
 		ImGui::Begin("Viewport");
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		glm::vec2 viewportGLM = { viewportPanelSize.x, viewportPanelSize.y };
+		m_ViewportFocused = ImGui::IsWindowFocused() && ImGui::IsWindowHovered();
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused);
 
-		if (m_ViewportSize != viewportGLM)
-		{
-			m_ViewportSize = viewportGLM;
-			m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		}
+		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
 		uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 
@@ -218,11 +265,11 @@ namespace Engine
 		ImGui::PopStyleVar();
 
 		ImGui::End();
-		ImGui::End();
 	}
 
 	void EditorLayer::OnEvent(Event& _e)
 	{
-		m_CameraController->OnEvent(_e);
+		if (m_ViewportFocused)
+			m_CameraController->OnEvent(_e);
 	}
 }

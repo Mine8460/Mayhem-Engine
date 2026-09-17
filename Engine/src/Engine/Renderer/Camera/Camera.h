@@ -8,7 +8,20 @@ namespace Engine
 	class Camera
 	{
 	public:
-		Camera(void) = default;
+		Camera() {}
+		Camera(const glm::mat4& _projection)
+			: m_Projection(_projection) {}
+		virtual ~Camera() = default;
+
+		const glm::mat4& GetProjection() const { return m_Projection; }
+	protected:
+		glm::mat4 m_Projection = glm::mat4(1.0f);
+	};
+
+	class Camera2
+	{
+	public:
+		Camera2(void) = default;
 
 		const glm::vec3& GetPosition() const { return m_Position; }
 		void SetPosition(const glm::vec3& _position) { m_Position = _position; RecalculateViewMatrix(); }
@@ -35,7 +48,7 @@ namespace Engine
 	public:
 		CameraController(void) = default;
 	private:
-		Ref<Camera> m_Camera;
+		Ref<Camera2> m_Camera;
 	};
 }
 #pragma once

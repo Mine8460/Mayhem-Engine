@@ -1,5 +1,6 @@
 #include <Enpch.h>
 #include "Logger.h"
+#include <cassert>
 
 namespace Engine
 {
@@ -29,5 +30,9 @@ namespace Engine
 	void Logger::Fatal(const char* _string)
 	{
 		std::cout << "FATAL : " << _string << std::endl;
+	}
+	void Logger::Assert(bool _value, const char* _string)
+	{
+		assert(_value && _string);
 	}
 }

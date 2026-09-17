@@ -9,6 +9,7 @@ namespace Engine
 	class Renderer2D
 	{
 	public:
+
 		struct Statistics
 		{
 			uint32_t DrawCalls = 0;
@@ -22,6 +23,7 @@ namespace Engine
 		static void Shutdown();
 
 		static void BeginScene(const OrthographicCamera& _cam);
+		static void BeginScene(const Camera& _cam, const glm::mat4& _transform);
 		static void EndScene();
 		static void Flush();
 
@@ -33,6 +35,10 @@ namespace Engine
 		static void DrawQuad(const glm::vec2& _pos, const glm::vec2& _size, const Ref<SubTexture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
 		static void DrawQuad(const glm::vec3& _pos, const glm::vec2& _size, const Ref<SubTexture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
 	
+		static void DrawQuad(const glm::mat4& _transform, const glm::vec4 _color);
+		static void DrawQuad(const glm::mat4& _transform, const Ref<Texture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
+		static void DrawQuad(const glm::mat4& _transform, const Ref<SubTexture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
+		
 		static void DrawRotatedQuad(const glm::vec2& _pos, const glm::vec2& _size, float _rotation, const glm::vec4 _color);
 		static void DrawRotatedQuad(const glm::vec3& _pos, const glm::vec2& _size, float _rotation, const glm::vec4 _color);
 		static void DrawRotatedQuad(const glm::vec2& _pos, const glm::vec2& _size, float _rotation, const Ref<Texture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);

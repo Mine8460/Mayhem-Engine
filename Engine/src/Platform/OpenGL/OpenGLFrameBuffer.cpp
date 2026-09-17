@@ -4,6 +4,7 @@
 
 namespace Engine
 {
+	static const uint32_t s_MaxFrameBufferSize = 8192;
 
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferSpecification& _spec)
 		: m_Spec(_spec)
@@ -61,6 +62,19 @@ namespace Engine
 
 	void OpenGLFrameBuffer::Resize(uint32_t _w, uint32_t _h)
 	{
+		if (_w <= 0 || _w > s_MaxFrameBufferSize)
+		{
+			ENGINE_CORE_WARN("Attempt to resize FrameBuffer to an invalide Size");
+			return;
+		}
+		if (_h <= 0 || _h > s_MaxFrameBufferSize)
+		{
+			ENGINE_CORE_WARN("Attempt to resize FrameBuffer to an invalide Size");
+			return;
+		}
+
+		glViewport(0, 0, _w, _h);
+
 		m_Spec.Width = _w;
 		m_Spec.Height = _h;
 

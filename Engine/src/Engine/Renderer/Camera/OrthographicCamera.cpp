@@ -74,6 +74,12 @@ namespace Engine
 		dispatcher.Dispatch<WindowResizeEvent>(ENGINE_BIND_EVENT_FN(OrthographicCameraController::OnWidowResized));
 	}
 
+	void OrthographicCameraController::OnResize(float _w, float _h)
+	{
+		m_AspectRatio = _w / _h;
+		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, m_ZoomLevel, -m_ZoomLevel);
+	}
+
 	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& _e)
 	{
 		m_ZoomLevel -= _e.GetYOffset() * 0.2f;

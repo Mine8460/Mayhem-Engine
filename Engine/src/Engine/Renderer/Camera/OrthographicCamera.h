@@ -8,7 +8,7 @@
 namespace Engine
 {
 
-	class OrthographicCamera : public Camera
+	class OrthographicCamera : public Camera2
 	{
 	public:
 		OrthographicCamera(float _left, float _right, float _bottom, float _top);
@@ -25,6 +25,8 @@ namespace Engine
 	
 		void OnUpdate(Timestep _ts);
 		void OnEvent(Event& _e);
+
+		void OnResize(float _w, float _h);
 
 		OrthographicCamera& GetCamera(void) { return m_Camera; }
 	private:

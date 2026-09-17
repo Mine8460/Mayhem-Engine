@@ -2,6 +2,7 @@
 
 #include <Engine.h>
 #include <chrono>
+#include "Panels/SceneHierarchyPanel.h"
 
 namespace Engine
 {
@@ -17,7 +18,12 @@ namespace Engine
 		void OnUpdate(Timestep _timestep) override;
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& _e) override;
+
 	private:
+
+	private:
+		Ref<Scene> m_ActiveScene;
+
 		Ref<OrthographicCameraController> m_CameraController;
 
 		Ref<Texture2D> m_Texture;
@@ -27,6 +33,8 @@ namespace Engine
 
 		Ref<FrameBuffer> m_FrameBuffer;
 		glm::vec2 m_ViewportSize;
+
+		bool m_ViewportFocused = false;
 
 		int spriteToUse = 1;
 
@@ -39,5 +47,8 @@ namespace Engine
 		};
 
 		std::vector<ProfileResult> m_ProfileResults;
+
+		// Panels
+		SceneHierarchyPanel m_Hierarchy;
 	};
 }

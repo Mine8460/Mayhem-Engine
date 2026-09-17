@@ -18,12 +18,17 @@ namespace Engine
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
 
+		virtual void OnEvent(Event& _e) override;
+
 		void Begin();
 		void End();
+
+		void BlockEvents(bool _value) { m_BlockEvents = _value; }
 	private:
 
 		ImGuiKey ConvertGLFWInputToImGui(int _key);
 	private:
+		bool m_BlockEvents = true;
 		float m_Time = 0.f;
 	};
 }
