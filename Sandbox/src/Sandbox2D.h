@@ -3,7 +3,7 @@
 #include <Engine.h>
 #include <chrono>
 
-class EditorLayer : public Engine::Layer
+class EditorLayer : public Mayhem::Layer
 {
 public:
 	EditorLayer();
@@ -11,16 +11,16 @@ public:
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
 
-	void OnUpdate(Engine::Timestep _timestep) override;
+	void OnUpdate(Mayhem::Timestep _timestep) override;
 	virtual void OnImGuiRender() override;
-	virtual void OnEvent(Engine::Event& _e) override;
+	virtual void OnEvent(Mayhem::Event& _e) override;
 private:
-	Engine::Ref<Engine::OrthographicCameraController> m_CameraController;
+	Mayhem::Ref<Mayhem::OrthographicCameraController> m_CameraController;
 
-	Engine::Ref<Engine::Texture2D> m_Texture;
-	Engine::Ref<Engine::Texture2D> m_AlphaTexture;
-	Engine::Ref<Engine::Texture2D> m_SpriteSheet;
-	std::vector<Engine::Ref<Engine::SubTexture2D>> m_Sprites;
+	Mayhem::Ref<Mayhem::Texture2D> m_Texture;
+	Mayhem::Ref<Mayhem::Texture2D> m_AlphaTexture;
+	Mayhem::Ref<Mayhem::Texture2D> m_SpriteSheet;
+	std::vector<Mayhem::Ref<Mayhem::SubTexture2D>> m_Sprites;
 
 	int spriteToUse = 1;
 

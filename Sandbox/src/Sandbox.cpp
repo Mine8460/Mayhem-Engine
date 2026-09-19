@@ -4,21 +4,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class EngineEditor : public Engine::Application
+class Sandbox : public Mayhem::Application
 {
 public:
-	EngineEditor(void)
+	Sandbox(std::string _name) : Mayhem::Application(_name)
 	{
 		PushLayer(new EditorLayer());
 	}
 
-	~EngineEditor()
+	~Sandbox()
 	{
 		
 	}
 };
 
-Engine::Application* Engine::CreateApplication()
+Mayhem::Application* Mayhem::CreateApplication()
 {
-	return new EngineEditor;
+	return new Sandbox("Sandbox");
 }

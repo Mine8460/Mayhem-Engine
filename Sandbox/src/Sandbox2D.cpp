@@ -42,17 +42,17 @@ private:
 
 EditorLayer::EditorLayer() : Layer("Sandbox2D")
 {
-	m_CameraController = std::make_shared<Engine::OrthographicCameraController>(1280.0f / 720.0f, true);
+	m_CameraController = std::make_shared<Mayhem::OrthographicCameraController>(1280.0f / 720.0f, true);
 }
 
 void EditorLayer::OnAttach()
 {
-	m_Texture = Engine::Texture2D::Create("assets/textures/Checkerboard.png");
-	m_AlphaTexture = Engine::Texture2D::Create("assets/textures/AlphaCheckerboard.png");
-	m_SpriteSheet = Engine::Texture2D::Create("assets/game/Spritesheet.png");
-	m_Sprites = Engine::SubTexture2D::CreateAllSpriteSheet(m_SpriteSheet, { 64.f,64.f });
+	m_Texture = Mayhem::Texture2D::Create("assets/textures/Checkerboard.png");
+	m_AlphaTexture = Mayhem::Texture2D::Create("assets/textures/AlphaCheckerboard.png");
+	m_SpriteSheet = Mayhem::Texture2D::Create("assets/game/Spritesheet.png");
+	m_Sprites = Mayhem::SubTexture2D::CreateAllSpriteSheet(m_SpriteSheet, { 64.f,64.f });
 
-    Engine::FrameBufferSpecification spec;
+    Mayhem::FrameBufferSpecification spec;
     spec.Width = 1280;
     spec.Height = 720;
 }
@@ -61,14 +61,14 @@ void EditorLayer::OnDetach()
 {
 }
 
-void EditorLayer::OnUpdate(Engine::Timestep _timestep)
+void EditorLayer::OnUpdate(Mayhem::Timestep _timestep)
 {
 	PROFILE_FUNCTION("Sandbox2D::OnUpdate");
 	// Update
 	m_CameraController->OnUpdate(_timestep);
 
 	// Statistics
-	Engine::Renderer2D::ResetStats();
+	Mayhem::Renderer2D::ResetStats();
 	// Render
 	{
 		static float rotation = 0.0f;
@@ -77,13 +77,13 @@ void EditorLayer::OnUpdate(Engine::Timestep _timestep)
 
 
 		PROFILE_FUNCTION("Sandbox2D::OnRender");
-		Engine::RenderCommand::Clear(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-		Engine::Renderer2D::BeginScene(m_CameraController->GetCamera());
+		Mayhem::RenderCommand::Clear(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+		Mayhem::Renderer2D::BeginScene(m_CameraController->GetCamera());
 
-		Engine::Renderer2D::DrawQuad({ 0.f,0.f }, { 0.9f, 0.9f }, m_Sprites[spriteToUse], glm::vec4(1.0f), 1.f);
-		Engine::Renderer2D::DrawQuad({ 1.f,0.f }, { 0.9f, 0.9f }, m_Texture, glm::vec4(1.0f), 1.f);
+		Mayhem::Renderer2D::DrawQuad({ 0.f,0.f }, { 0.9f, 0.9f }, m_Sprites[spriteToUse], glm::vec4(1.0f), 1.f);
+		Mayhem::Renderer2D::DrawQuad({ 1.f,0.f }, { 0.9f, 0.9f }, m_Texture, glm::vec4(1.0f), 1.f);
 
-		Engine::Renderer2D::EndScene();
+		Mayhem::Renderer2D::EndScene();
 	}
 }
 
@@ -96,7 +96,7 @@ void EditorLayer::OnImGuiRender()
     ImGui::End();
     ImGui::Begin("Profiling");
 
-    Engine::Renderer2D::Statistics stats = Engine::Renderer2D::GetStats();
+    Mayhem::Renderer2D::Statistics stats = Mayhem::Renderer2D::GetStats();
 
     ImGui::Text("Renderer2D Stats:");
     ImGui::Text("Draw Calls: %d", stats.DrawCalls);
@@ -118,7 +118,7 @@ void EditorLayer::OnImGuiRender()
     ImGui::End();
 }
 
-void EditorLayer::OnEvent(Engine::Event& _e)
+void EditorLayer::OnEvent(Mayhem::Event& _e)
 {
 	m_CameraController->OnEvent(_e);
 }

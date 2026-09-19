@@ -1,6 +1,6 @@
 workspace "Engine"
 	architecture "x64"
-	startproject "Engine-Editor"
+	startproject "Mayhem-Editor"
 
 	configurations
 	{
@@ -12,19 +12,19 @@ workspace "Engine"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
-IncludeDir["GLFW"] = "Engine/vendor/GLFW/include"
-IncludeDir["GLAD"] = "Engine/vendor/GLAD/include"
-IncludeDir["ImGui"] = "Engine/vendor/imgui"
-IncludeDir["GLM"] = "Engine/vendor/glm"
-IncludeDir["stb"] = "Engine/vendor/stb_image"
-IncludeDir["entt"] = "Engine/vendor/entt"
+IncludeDir["GLFW"] = "Mayhem/vendor/GLFW/include"
+IncludeDir["GLAD"] = "Mayhem/vendor/GLAD/include"
+IncludeDir["ImGui"] = "Mayhem/vendor/imgui"
+IncludeDir["GLM"] = "Mayhem/vendor/glm"
+IncludeDir["stb"] = "Mayhem/vendor/stb_image"
+IncludeDir["entt"] = "Mayhem/vendor/entt"
 
-include "Engine/vendor/GLFW"
-include "Engine/vendor/GLAD"
-include "Engine/vendor/imgui"
+include "Mayhem/vendor/GLFW"
+include "Mayhem/vendor/GLAD"
+include "Mayhem/vendor/imgui"
 
-project "Engine"
-	location "Engine"
+project "Mayhem"
+	location "Mayhem"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
@@ -34,7 +34,7 @@ project "Engine"
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "Enpch.h"
-	pchsource "Engine/src/Enpch.cpp"
+	pchsource "Mayhem/src/Enpch.cpp"
 
 	files
 	{
@@ -108,16 +108,16 @@ project "Sandbox"
 
 	includedirs
 	{
-		"Engine/vendor/spdlog/include",
-		"Engine/src",
-		"Engine/vendor",
+		"Mayhem/vendor/spdlog/include",
+		"Mayhem/src",
+		"Mayhem/vendor",
 		"%{IncludeDir.GLM}",
 		"%{IncludeDir.entt}",
 	}
 
 	links
 	{
-		"Engine"
+		"Mayhem"
 	}
 
 	filter "system:windows"
@@ -144,8 +144,8 @@ project "Sandbox"
 		runtime "Release"
 		optimize "on"
 
-project "Engine-Editor"
-	location "Engine-Editor"
+project "Mayhem-Editor"
+	location "Mayhem-Editor"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
@@ -162,16 +162,16 @@ project "Engine-Editor"
 
 	includedirs
 	{
-		"Engine/vendor/spdlog/include",
-		"Engine/src",
-		"Engine/vendor",
+		"Mayhem/vendor/spdlog/include",
+		"Mayhem/src",
+		"Mayhem/vendor",
 		"%{IncludeDir.GLM}",
 		"%{IncludeDir.entt}",
 	}
 
 	links
 	{
-		"Engine"
+		"Mayhem"
 	}
 
 	filter "system:windows"
