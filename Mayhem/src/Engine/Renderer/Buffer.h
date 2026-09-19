@@ -38,7 +38,7 @@ namespace Mayhem
 		case Mayhem::ShaderDataType::Bool: return sizeof(bool);
 		}
 
-		ENGINE_CORE_ERROR("Unknown ShaderDataType!");
+		MAYHEM_CORE_ERROR("Unknown ShaderDataType!");
 		return 0;
 	}
 

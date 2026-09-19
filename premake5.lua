@@ -18,10 +18,12 @@ IncludeDir["ImGui"] = "Mayhem/vendor/imgui"
 IncludeDir["GLM"] = "Mayhem/vendor/glm"
 IncludeDir["stb"] = "Mayhem/vendor/stb_image"
 IncludeDir["entt"] = "Mayhem/vendor/entt"
+IncludeDir["yaml"] = "Mayhem/vendor/yaml/include"
 
 include "Mayhem/vendor/GLFW"
 include "Mayhem/vendor/GLAD"
 include "Mayhem/vendor/imgui"
+include "Mayhem/vendor/yaml"
 
 project "Mayhem"
 	location "Mayhem"
@@ -55,6 +57,7 @@ project "Mayhem"
 		"%{IncludeDir.GLM}",
 		"%{IncludeDir.stb}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml}",
 	}
 
 	links
@@ -62,6 +65,7 @@ project "Mayhem"
 		"GLFW",
 		"GLAD",
 		"ImGui",
+		"yaml-cpp",
 		"opengl32.lib"
 	}
 
@@ -70,6 +74,7 @@ project "Mayhem"
 
 		defines
 		{
+			YAML_CPP_STATIC_DEFINE,
 			"ENGINE_PLATFORM_WINDOWS",
 			"ENGINE_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
@@ -113,11 +118,13 @@ project "Sandbox"
 		"Mayhem/vendor",
 		"%{IncludeDir.GLM}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml}",
 	}
 
 	links
 	{
-		"Mayhem"
+		"Mayhem",
+		"yaml-cpp",
 	}
 
 	filter "system:windows"
@@ -167,12 +174,15 @@ project "Mayhem-Editor"
 		"Mayhem/vendor",
 		"%{IncludeDir.GLM}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml}",
 	}
 
 	links
 	{
-		"Mayhem"
+		"Mayhem",
+		"yaml-cpp",
 	}
+
 
 	filter "system:windows"
 		systemversion "latest"

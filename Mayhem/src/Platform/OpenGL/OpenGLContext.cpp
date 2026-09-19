@@ -15,10 +15,10 @@ namespace Mayhem
 		glfwMakeContextCurrent(m_WindowHandle);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-		ENGINE_CORE_INFO("OpenGL Info :");
-		ENGINE_CORE_INFO((const char*)glGetString(GL_VENDOR));
-		ENGINE_CORE_INFO((const char*)glGetString(GL_RENDERER));
-		ENGINE_CORE_INFO((const char*)glGetString(GL_VERSION));
+		MAYHEM_CORE_INFO("OpenGL Info :");
+		MAYHEM_CORE_INFO((const char*)glGetString(GL_VENDOR));
+		MAYHEM_CORE_INFO((const char*)glGetString(GL_RENDERER));
+		MAYHEM_CORE_INFO((const char*)glGetString(GL_VERSION));
 	}
 
 	void OpenGLContext::SwapBuffers()

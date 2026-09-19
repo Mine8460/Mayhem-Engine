@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <imgui/imgui.h>
 #include <entt.hpp>
+#include <Engine/Scene/SceneSerializer.h>
 
 
 
@@ -11,39 +12,39 @@
 namespace Mayhem
 {
 
-	template<typename Fn>
-	class Timer
-	{
-	public:
-		Timer(const char* _name, Fn&& _func) : m_Name(_name), m_Stopped(false), m_Func(_func)
-		{
-			m_StartTimepoint = std::chrono::high_resolution_clock::now();
-		}
-		~Timer(void)
-		{
-			if (!m_Stopped)
-				Stop();
-		}
+	//template<typename Fn>
+	//class Timer
+	//{
+	//public:
+	//	Timer(const char* _name, Fn&& _func) : m_Name(_name), m_Stopped(false), m_Func(_func)
+	//	{
+	//		m_StartTimepoint = std::chrono::high_resolution_clock::now();
+	//	}
+	//	~Timer(void)
+	//	{
+	//		if (!m_Stopped)
+	//			Stop();
+	//	}
 
-		void Stop(void)
-		{
-			auto endTimepoint = std::chrono::high_resolution_clock::now();
+	//	void Stop(void)
+	//	{
+	//		auto endTimepoint = std::chrono::high_resolution_clock::now();
 
-			long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
-			long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
+	//		long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
+	//		long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
 
-			m_Stopped = true;
+	//		m_Stopped = true;
 
-			float duration = (end - start) * 0.001f;
-			m_Func({ m_Name, duration });
-		}
+	//		float duration = (end - start) * 0.001f;
+	//		m_Func({ m_Name, duration });
+	//	}
 
-	private:
-		const char* m_Name;
-		std::chrono::time_point<std::chrono::steady_clock> m_StartTimepoint;
-		bool m_Stopped = false;
-		Fn m_Func;
-	};
+	//private:
+	//	Fn m_Func;
+	//	const char* m_Name;
+	//	std::chrono::time_point<std::chrono::steady_clock> m_StartTimepoint;
+	//	bool m_Stopped = false;
+	//};
 
 
 	EditorLayer::EditorLayer() : Layer("Sandbox2D")
@@ -66,53 +67,55 @@ namespace Mayhem
 
 		m_ActiveScene = MakeRef<Scene>();
 
-		class CameraController : public ScriptableEntity
-		{
-		public:
-			virtual void OnCreate() override
-			{
+		//class CameraController : public ScriptableEntity
+		//{
+		//public:
+		//	virtual void OnCreate() override
+		//	{
 
-			}
+		//	}
 
-			virtual void OnDestroy() override
-			{
+		//	virtual void OnDestroy() override
+		//	{
 
-			}
+		//	}
 
-			virtual void OnUpdate(Timestep _ts) override
-			{
-				TransformComponent& trans = GetComponent<TransformComponent>();
+		//	virtual void OnUpdate(Timestep _ts) override
+		//	{
+		//		TransformComponent& trans = GetComponent<TransformComponent>();
 
-				float camSpeed = 1.f * GetComponent<CameraComponent>().m_Camera.GetOrthographicSize();
-				float dt = _ts.GetSeconds();
+		//		float camSpeed = 1.f * GetComponent<CameraComponent>().m_Camera.GetOrthographicSize();
+		//		float dt = _ts.GetSeconds();
 
-				if (Input::IsKeyPressed(ENGINE_KEY_A))
-					trans.m_Translation.x -= camSpeed * dt;
+		//		if (Input::IsKeyPressed(ENGINE_KEY_A))
+		//			trans.m_Translation.x -= camSpeed * dt;
 
-				if (Input::IsKeyPressed(ENGINE_KEY_D))
-					trans.m_Translation.x += camSpeed * dt;
+		//		if (Input::IsKeyPressed(ENGINE_KEY_D))
+		//			trans.m_Translation.x += camSpeed * dt;
 
-				if (Input::IsKeyPressed(ENGINE_KEY_S))
-					trans.m_Translation.y -= camSpeed * dt;
+		//		if (Input::IsKeyPressed(ENGINE_KEY_S))
+		//			trans.m_Translation.y -= camSpeed * dt;
 
-				if (Input::IsKeyPressed(ENGINE_KEY_W))
-					trans.m_Translation.y += camSpeed * dt;
-			}
-		};
+		//		if (Input::IsKeyPressed(ENGINE_KEY_W))
+		//			trans.m_Translation.y += camSpeed * dt;
+		//	}
+		//};
 
-		Entity camera = m_ActiveScene->CreateEntity("Main camera");
-		camera.AddComponent<CameraComponent>();
-		camera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+		//Entity camera = m_ActiveScene->CreateEntity("Main camera");
+		//camera.AddComponent<CameraComponent>();
+		//camera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
-		Entity square = m_ActiveScene->CreateEntity("Red square");
-		SpriteRenderer& sprite = square.AddComponent<SpriteRenderer>(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
-		sprite.ChangeTexture(m_Texture);
+		//Entity square = m_ActiveScene->CreateEntity("Red square");
+		//SpriteRenderer& sprite = square.AddComponent<SpriteRenderer>(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
+		//sprite.ChangeTexture(m_Texture);
 
-		square = m_ActiveScene->CreateEntity("White square");
-		sprite = square.AddComponent<SpriteRenderer>(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		sprite.ChangeTexture(m_Texture);
+		//square = m_ActiveScene->CreateEntity("White square");
+		//sprite = square.AddComponent<SpriteRenderer>(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		//sprite.ChangeTexture(m_Texture);
 
 		m_Hierarchy.SetContext(m_ActiveScene);
+
+
 	}
 
 	void EditorLayer::OnDetach()
@@ -121,7 +124,7 @@ namespace Mayhem
 
 	void EditorLayer::OnUpdate(Timestep _timestep)
 	{
-		PROFILE_FUNCTION("Editor::OnUpdate");
+		//PROFILE_FUNCTION("Editor::OnUpdate");
 
 		// Resize
 		FrameBufferSpecification spec = m_FrameBuffer->GetSpecification();
@@ -143,7 +146,7 @@ namespace Mayhem
 		Renderer2D::ResetStats();
 		// Render
 		{
-			PROFILE_FUNCTION("Editor::OnRender");
+			//PROFILE_FUNCTION("Editor::OnRender");
 			m_FrameBuffer->Bind();
 
 			// Update Scene
@@ -200,11 +203,15 @@ namespace Mayhem
 
 		// Submit the DockSpace
 		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.WindowMinSize.x = 370.0f;
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
+
+		style.WindowMinSize.x = 30.0f;
 
 		if (ImGui::BeginMenuBar())
 		{
@@ -212,9 +219,15 @@ namespace Mayhem
 			{
 				if (ImGui::MenuItem("Save"))
 				{
+					SceneSerializer serializer(m_ActiveScene);
+					serializer.Serialize("assets/scenes/Example.mayhem");
+					//serializer.Deserialize("assets/scenes/Example.mayhem");
 				}
-				if (ImGui::MenuItem("Save As..."))
+				if (ImGui::MenuItem("Open"))
 				{
+					SceneSerializer serializer(m_ActiveScene);
+					//serializer.Serialize("assets/scenes/Example.mayhem");
+					serializer.Deserialize("assets/scenes/Example.mayhem");
 				}
 
 				ImGui::Separator();

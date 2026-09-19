@@ -17,4 +17,6 @@
   </Project>
   <Project Path="Sandbox\Sandbox.vcxproj" Id="F4C124E3-60A1-A37E-69B9-2E55D5170AE0">
   </Project>
+  <Project Path="Mayhem\vendor\yaml\yaml-cpp.vcxproj" Id="88F1A057-74BE-FB62-9DD7-E90A890331F1">
+  </Project>
 </Solution>

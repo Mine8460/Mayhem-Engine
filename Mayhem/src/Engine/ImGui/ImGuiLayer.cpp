@@ -31,6 +31,9 @@ namespace Mayhem
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
+		io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Bold.ttf", 18.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Medium.ttf", 18.0f);
+
 		// Setup style
 		ImGui::StyleColorsDark();
 
@@ -40,6 +43,8 @@ namespace Mayhem
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
+
+		SetDarkThemColors();
 
 		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
@@ -90,6 +95,178 @@ namespace Mayhem
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
+	}
+
+	void ImGuiLayer::SetDarkThemColors()
+	{
+		auto& colors = ImGui::GetStyle().Colors;
+
+		//// Window
+		//colors[ImGuiCol_WindowBg] = ImVec4{ 0.043f, 0.039f, 0.059f, 1.0f };
+
+		//// Headers
+		//colors[ImGuiCol_Header] = ImVec4{ 0.094f, 0.082f, 0.122f, 1.0f };
+		//colors[ImGuiCol_HeaderHovered] = ImVec4{ 0.145f, 0.125f, 0.184f, 1.0f };
+		//colors[ImGuiCol_HeaderActive] = ImVec4{ 0.188f, 0.149f, 0.239f, 1.0f };
+
+		//// Buttons
+		//colors[ImGuiCol_Button] = ImVec4{ 0.094f, 0.082f, 0.122f, 1.0f };
+		//colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
+		//colors[ImGuiCol_ButtonActive] = ImVec4{ 0.443f, 0.227f, 0.569f, 1.0f };
+
+		//// Frame BG
+		//colors[ImGuiCol_FrameBg] = ImVec4{ 0.082f, 0.075f, 0.102f, 1.0f };
+		//colors[ImGuiCol_FrameBgHovered] = ImVec4{ 0.129f, 0.110f, 0.161f, 1.0f };
+		//colors[ImGuiCol_FrameBgActive] = ImVec4{ 0.173f, 0.141f, 0.212f, 1.0f };
+
+		//// Tabs
+		//colors[ImGuiCol_Tab] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
+		//colors[ImGuiCol_TabHovered] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
+		//colors[ImGuiCol_TabActive] = ImVec4{ 0.227f, 0.161f, 0.282f, 1.0f };
+		//colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
+		//colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.122f, 0.102f, 0.157f, 1.0f };
+
+		//// Title
+		//colors[ImGuiCol_TitleBg] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
+		//colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.094f, 0.075f, 0.122f, 1.0f };
+		//colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
+
+		// ============================================================
+// MAYHEM ENGINE - ImGui Theme
+// ============================================================
+
+// Main window
+		colors[ImGuiCol_WindowBg] = ImVec4{ 0.043f, 0.039f, 0.059f, 1.0f };
+
+		// ============================================================
+		// Headers
+		// ============================================================
+
+		colors[ImGuiCol_Header] = ImVec4{ 0.094f, 0.082f, 0.122f, 1.0f };
+		colors[ImGuiCol_HeaderHovered] = ImVec4{ 0.145f, 0.125f, 0.184f, 1.0f };
+		colors[ImGuiCol_HeaderActive] = ImVec4{ 0.188f, 0.149f, 0.239f, 1.0f };
+
+		// ============================================================
+		// Buttons
+		// ============================================================
+
+		colors[ImGuiCol_Button] = ImVec4{ 0.094f, 0.082f, 0.122f, 1.0f };
+		colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
+		colors[ImGuiCol_ButtonActive] = ImVec4{ 0.443f, 0.227f, 0.569f, 1.0f };
+
+		// ============================================================
+		// Frame Background
+		// ============================================================
+
+		colors[ImGuiCol_FrameBg] = ImVec4{ 0.082f, 0.075f, 0.102f, 1.0f };
+		colors[ImGuiCol_FrameBgHovered] = ImVec4{ 0.129f, 0.110f, 0.161f, 1.0f };
+		colors[ImGuiCol_FrameBgActive] = ImVec4{ 0.173f, 0.141f, 0.212f, 1.0f };
+
+		// ============================================================
+		// Tabs
+		// ============================================================
+
+		colors[ImGuiCol_Tab] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
+		colors[ImGuiCol_TabHovered] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
+		colors[ImGuiCol_TabActive] = ImVec4{ 0.227f, 0.161f, 0.282f, 1.0f };
+		colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
+		colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.122f, 0.102f, 0.157f, 1.0f };
+
+		// ============================================================
+		// Title Bar
+		// ============================================================
+
+		colors[ImGuiCol_TitleBg] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
+		colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.094f, 0.075f, 0.122f, 1.0f };
+		colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
+
+		// ============================================================
+		// Menu
+		// ============================================================
+
+		colors[ImGuiCol_MenuBarBg] = ImVec4{ 0.055f, 0.047f, 0.071f, 1.0f };
+		colors[ImGuiCol_PopupBg] = ImVec4{ 0.059f, 0.051f, 0.075f, 0.98f };
+
+		// ============================================================
+		// Borders
+		// ============================================================
+
+		colors[ImGuiCol_Border] = ImVec4{ 0.180f, 0.145f, 0.220f, 0.55f };
+		colors[ImGuiCol_BorderShadow] = ImVec4{ 0.000f, 0.000f, 0.000f, 0.00f };
+
+		// ============================================================
+		// Scrollbars
+		// ============================================================
+
+		colors[ImGuiCol_ScrollbarBg] = ImVec4{ 0.035f, 0.031f, 0.043f, 1.0f };
+		colors[ImGuiCol_ScrollbarGrab] = ImVec4{ 0.145f, 0.125f, 0.165f, 1.0f };
+		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4{ 0.250f, 0.200f, 0.300f, 1.0f };
+		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
+
+		// ============================================================
+		// Checkboxes / Sliders
+		// ============================================================
+
+		colors[ImGuiCol_CheckMark] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
+
+		colors[ImGuiCol_SliderGrab] = ImVec4{ 0.443f, 0.227f, 0.569f, 1.0f };
+		colors[ImGuiCol_SliderGrabActive] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
+
+		// ============================================================
+		// Separators
+		// ============================================================
+
+		colors[ImGuiCol_Separator] = ImVec4{ 0.180f, 0.145f, 0.220f, 0.55f };
+		colors[ImGuiCol_SeparatorHovered] = ImVec4{ 0.608f, 0.302f, 0.792f, 0.78f };
+		colors[ImGuiCol_SeparatorActive] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
+
+		// ============================================================
+		// Text
+		// ============================================================
+
+		colors[ImGuiCol_Text] = ImVec4{ 0.900f, 0.890f, 0.920f, 1.0f };
+		colors[ImGuiCol_TextDisabled] = ImVec4{ 0.450f, 0.430f, 0.480f, 1.0f };
+
+		// ============================================================
+		// Selection
+		// ============================================================
+
+		colors[ImGuiCol_TextSelectedBg] = ImVec4{ 0.608f, 0.302f, 0.792f, 0.35f };
+
+		// ============================================================
+		// Drag & Drop
+		// ============================================================
+
+		colors[ImGuiCol_DragDropTarget] = ImVec4{ 0.950f, 0.250f, 0.550f, 0.90f };
+
+		// ============================================================
+		// Navigation
+		// ============================================================
+
+		colors[ImGuiCol_NavHighlight] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
+		colors[ImGuiCol_NavWindowingHighlight] = ImVec4{ 0.608f, 0.302f, 0.792f, 0.70f };
+		colors[ImGuiCol_NavWindowingDimBg] = ImVec4{ 0.000f, 0.000f, 0.000f, 0.20f };
+
+		// ============================================================
+		// Modal
+		// ============================================================
+
+		colors[ImGuiCol_ModalWindowDimBg] = ImVec4{ 0.000f, 0.000f, 0.000f, 0.55f };
+
+		auto& style = ImGui::GetStyle();
+
+		style.WindowRounding = 4.0f;
+		style.ChildRounding = 4.0f;
+		style.FrameRounding = 3.0f;
+		style.PopupRounding = 4.0f;
+		style.ScrollbarRounding = 4.0f;
+		style.GrabRounding = 3.0f;
+		style.TabRounding = 3.0f;
+
+		style.WindowBorderSize = 1.0f;
+		style.ChildBorderSize = 1.0f;
+		style.PopupBorderSize = 1.0f;
+		style.FrameBorderSize = 0.0f;
 	}
 
 	ImGuiKey ImGuiLayer::ConvertGLFWInputToImGui(int _key)

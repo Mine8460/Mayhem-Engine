@@ -19,7 +19,7 @@ namespace Mayhem
 		template<typename T>
 		T& GetComponent()
 		{
-			ENGINE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+			MAYHEM_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
 
 			return m_Scene->m_Registry.get<T>(m_EntityHandle);
 		}
@@ -37,7 +37,7 @@ namespace Mayhem
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args)
 		{
-			ENGINE_CORE_ASSERT(!HasComponent<T>(), "Entity already has this component!");
+			MAYHEM_CORE_ASSERT(!HasComponent<T>(), "Entity already has this component!");
 
 			T* component = &m_Scene->m_Registry.emplace<T>(
 				m_EntityHandle,
@@ -58,7 +58,7 @@ namespace Mayhem
 		template<typename T>
 		void RemoveComponent()
 		{
-			ENGINE_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+			MAYHEM_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
 
 			m_Scene->m_Registry.remove<T>(m_EntityHandle);
 		}

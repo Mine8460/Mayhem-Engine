@@ -24,8 +24,8 @@ namespace Mayhem
 		void End();
 
 		void BlockEvents(bool _value) { m_BlockEvents = _value; }
-	private:
-
+	public:
+		void SetDarkThemColors();
 		ImGuiKey ConvertGLFWInputToImGui(int _key);
 	private:
 		bool m_BlockEvents = true;

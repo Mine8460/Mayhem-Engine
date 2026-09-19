@@ -19,11 +19,11 @@ namespace Mayhem
 }
 
 // Core log macros
-#define ENGINE_CORE_INFO(...) Mayhem::Logger::GetInstance()->Info(__VA_ARGS__);
-#define ENGINE_CORE_WARN(...) Mayhem::Logger::GetInstance()->Warn(__VA_ARGS__);
-#define ENGINE_CORE_ERROR(...) Mayhem::Logger::GetInstance()->Error(__VA_ARGS__);
-#define ENGINE_CORE_FATAL(...) Mayhem::Logger::GetInstance()->Fatal(__VA_ARGS__);
-#define ENGINE_CORE_ASSERT(...) Mayhem::Logger::GetInstance()->Assert(__VA_ARGS__);
+#define MAYHEM_CORE_INFO(...) Mayhem::Logger::GetInstance()->Info(__VA_ARGS__);
+#define MAYHEM_CORE_WARN(...) Mayhem::Logger::GetInstance()->Warn(__VA_ARGS__);
+#define MAYHEM_CORE_ERROR(...) Mayhem::Logger::GetInstance()->Error(__VA_ARGS__);
+#define MAYHEM_CORE_FATAL(...) Mayhem::Logger::GetInstance()->Fatal(__VA_ARGS__);
+#define MAYHEM_CORE_ASSERT(...) Mayhem::Logger::GetInstance()->Assert(__VA_ARGS__);
 
 // Client log macros
 #define LOG_INFO(...) Mayhem::Logger::GetInstance()->Info(__VA_ARGS__);

@@ -14,8 +14,8 @@ namespace Mayhem
 		unsigned int height;
 
 		WindowProps(const std::string& _title = "Engine",
-			unsigned int _width = 1280,
-			unsigned int _height = 720)
+			unsigned int _width = 1600,
+			unsigned int _height = 900)
 			: title(_title), width(_width), height(_height)
 		{
 		}

@@ -13,9 +13,9 @@ namespace Mayhem
 		stbi_uc* data = stbi_load(_path.c_str(), &width, &height, &channels, 0);
 		if (data == nullptr)
 		{
-			ENGINE_CORE_ERROR("Failed to load the image !!!");
-			ENGINE_CORE_ERROR(stbi_failure_reason());
-			ENGINE_CORE_ERROR(_path.c_str());
+			MAYHEM_CORE_ERROR("Failed to load the image !!!");
+			MAYHEM_CORE_ERROR(stbi_failure_reason());
+			MAYHEM_CORE_ERROR(_path.c_str());
 		}
 		m_Width = width;
 		m_Height = height;

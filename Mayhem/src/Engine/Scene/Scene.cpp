@@ -93,7 +93,7 @@ namespace Mayhem
 		}
 		else
 		{
-			ENGINE_CORE_WARN("No main camera");
+			MAYHEM_CORE_WARN("No main camera");
 		}
 	}
 

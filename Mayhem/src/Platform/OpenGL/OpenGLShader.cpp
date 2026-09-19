@@ -116,8 +116,8 @@ namespace Mayhem
 		}
 		else
 		{
-			ENGINE_CORE_ERROR("Could not open shader file at path : ");
-			ENGINE_CORE_ERROR(_path.c_str());
+			MAYHEM_CORE_ERROR("Could not open shader file at path : ");
+			MAYHEM_CORE_ERROR(_path.c_str());
 		}
 
 		return result;
@@ -175,8 +175,8 @@ namespace Mayhem
 				// We don't need the FlatColorShader anymore.
 				glDeleteShader(shader);
 
-				ENGINE_CORE_ERROR("Shader compilation failure !");
-				ENGINE_CORE_ERROR(infoLog.data());
+				MAYHEM_CORE_ERROR("Shader compilation failure !");
+				MAYHEM_CORE_ERROR(infoLog.data());
 				break;
 			}
 			glAttachShader(m_RendererID, shader);
@@ -204,8 +204,8 @@ namespace Mayhem
 			for (auto shader : glShaderIDs)
 				glDeleteShader(shader);
 
-			ENGINE_CORE_ERROR("Shaders link failure !");
-			ENGINE_CORE_ERROR(infoLog.data());
+			MAYHEM_CORE_ERROR("Shaders link failure !");
+			MAYHEM_CORE_ERROR(infoLog.data());
 
 			return;
 		}

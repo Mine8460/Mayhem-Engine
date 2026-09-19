@@ -79,7 +79,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>ENGINE_PLATFORM_WINDOWS;_CRT_NO_SECURE_WARNINGS;ENGINE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Mayhem\vendor\spdlog\include;..\Mayhem\src;..\Mayhem\vendor;..\Mayhem\vendor\glm;..\Mayhem\vendor\entt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Mayhem\vendor\spdlog\include;..\Mayhem\src;..\Mayhem\vendor;..\Mayhem\vendor\glm;..\Mayhem\vendor\entt;..\Mayhem\vendor\yaml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -98,7 +98,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>ENGINE_PLATFORM_WINDOWS;_CRT_NO_SECURE_WARNINGS;ENGINE_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Mayhem\vendor\spdlog\include;..\Mayhem\src;..\Mayhem\vendor;..\Mayhem\vendor\glm;..\Mayhem\vendor\entt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Mayhem\vendor\spdlog\include;..\Mayhem\src;..\Mayhem\vendor;..\Mayhem\vendor\glm;..\Mayhem\vendor\entt;..\Mayhem\vendor\yaml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -121,7 +121,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>ENGINE_PLATFORM_WINDOWS;_CRT_NO_SECURE_WARNINGS;ENGINE_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Mayhem\vendor\spdlog\include;..\Mayhem\src;..\Mayhem\vendor;..\Mayhem\vendor\glm;..\Mayhem\vendor\entt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Mayhem\vendor\spdlog\include;..\Mayhem\src;..\Mayhem\vendor;..\Mayhem\vendor\glm;..\Mayhem\vendor\entt;..\Mayhem\vendor\yaml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -149,6 +149,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Mayhem\Mayhem.vcxproj">
       <Project>{C6A79BC2-B249-C698-9B04-DAEC87454DE9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Mayhem\vendor\yaml\yaml-cpp.vcxproj">
+      <Project>{88F1A057-74BE-FB62-9DD7-E90A890331F1}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -7,3 +7,6 @@
 [submodule "Engine/vendor/glm"]
 	path = Engine/vendor/glm
 	url = https://github.com/g-truc/glm
+[submodule "Mayhem/vendor/yaml"]
+	path = Mayhem/vendor/yaml
+	url = https://github.com/Mine8460/yaml-cpp

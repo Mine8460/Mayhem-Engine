@@ -13,7 +13,7 @@ namespace Mayhem
 
 	static void GLFWerrorCallback(int _errror, const char* _description)
 	{
-		ENGINE_CORE_ERROR(_description);
+		MAYHEM_CORE_ERROR(_description);
 	}
 
 	Window* Window::Create(std::string _name, const WindowProps& _props)

@@ -64,12 +64,12 @@ namespace Mayhem
 	{
 		if (_w <= 0 || _w > s_MaxFrameBufferSize)
 		{
-			ENGINE_CORE_WARN("Attempt to resize FrameBuffer to an invalide Size");
+			MAYHEM_CORE_WARN("Attempt to resize FrameBuffer to an invalide Size");
 			return;
 		}
 		if (_h <= 0 || _h > s_MaxFrameBufferSize)
 		{
-			ENGINE_CORE_WARN("Attempt to resize FrameBuffer to an invalide Size");
+			MAYHEM_CORE_WARN("Attempt to resize FrameBuffer to an invalide Size");
 			return;
 		}
 
