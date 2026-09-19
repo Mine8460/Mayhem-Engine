@@ -1,4 +1,4 @@
-# Engine [![License](https://img.shields.io/github/license/TheCherno/Hazel.svg)](https://github.com/Mine8460/Engine/blob/master/LICENSE)
+# Engine [![License](https://img.shields.io/github/license/Mine8460/Engine.svg)](https://github.com/Mine8460/Engine/blob/master/LICENSE)
 
 Engine is primarily an early-stage interactive application and rendering engine for Windows. Currently not much is implemented.
 
