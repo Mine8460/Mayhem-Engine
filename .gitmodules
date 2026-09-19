@@ -1,11 +1,11 @@
 [submodule "Engine/vendor/GLFW"]
-	path = Engine/vendor/GLFW
+	path = Mayhem/vendor/GLFW
 	url = https://github.com/TheCherno/glfw
 [submodule "Engine/vendor/imgui"]
-	path = Engine/vendor/imgui
+	path = Mayhem/vendor/imgui
 	url = https://github.com/Mine8460/imgui
 [submodule "Engine/vendor/glm"]
-	path = Engine/vendor/glm
+	path = Mayhem/vendor/glm
 	url = https://github.com/g-truc/glm
 [submodule "Mayhem/vendor/yaml"]
 	path = Mayhem/vendor/yaml
