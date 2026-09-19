@@ -1,11 +1,11 @@
-# Engine [![License](https://img.shields.io/github/license/Mine8460/Engine.svg)](https://github.com/Mine8460/Engine/blob/master/LICENSE)
+# MAYHEM [![License](https://img.shields.io/github/license/Mine8460/Mayhem-Engine.svg)](https://github.com/Mine8460/Mayhem-Engine/blob/master/LICENSE)
 
-Engine is primarily an early-stage interactive application and rendering engine for Windows. Currently not much is implemented.
+MAYHEM is primarily an early-stage interactive application and rendering engine for Windows. Currently not much is implemented.
 
 ***
 
 ## The Plan
-The plan for Engine is two-fold: to create a powerful 3D engine, but also to serve as an education tool for myself teaching me game engine design and architecture.
+The plan for MAYHEM is two-fold: to create a powerful 3D engine, but also to serve as an education tool for myself teaching me game engine design and architecture.
 
 ### Main features to come:
 - Fast 2D rendering
