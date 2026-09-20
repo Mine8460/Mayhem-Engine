@@ -3,6 +3,7 @@
 #include <Engine.h>
 #include <chrono>
 #include "Panels/SceneHierarchyPanel.h"
+#include <Engine/Renderer/Camera/EditorCamera.h>
 
 namespace Mayhem
 {
@@ -24,8 +25,7 @@ namespace Mayhem
 
 	private:
 		Ref<Scene> m_ActiveScene;
-
-		Ref<OrthographicCameraController> m_CameraController;
+		EditorCamera m_EditorCamera;
 
 		Ref<Texture2D> m_Texture;
 		Ref<Texture2D> m_AlphaTexture;
@@ -36,6 +36,7 @@ namespace Mayhem
 		glm::vec2 m_ViewportSize;
 
 		bool m_ViewportFocused = false;
+		bool m_ViewportHovered = false;
 
 		int spriteToUse = 1;
 
@@ -46,6 +47,8 @@ namespace Mayhem
 			const char* Name;
 			float Time;
 		};
+
+		int m_GizmoType = 0;
 
 		std::vector<ProfileResult> m_ProfileResults;
 

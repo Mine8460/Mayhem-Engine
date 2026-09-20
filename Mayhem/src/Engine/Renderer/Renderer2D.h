@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Camera/OrthographicCamera.h"
+#include "Camera/EditorCamera.h"
 #include "Texture.h"
 #include "SubTexture2D.h"
 
@@ -22,7 +23,8 @@ namespace Mayhem
 		static void Init();
 		static void Shutdown();
 
-		static void BeginScene(const OrthographicCamera& _cam);
+		static void BeginScene(const OrthographicCamera& _cam); // TODO: REMOVE
+		static void BeginScene(const EditorCamera& _cam);
 		static void BeginScene(const Camera& _cam, const glm::mat4& _transform);
 		static void EndScene();
 		static void Flush();

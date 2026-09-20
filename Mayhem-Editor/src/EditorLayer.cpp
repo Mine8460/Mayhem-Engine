@@ -50,7 +50,6 @@ namespace Mayhem
 
 	EditorLayer::EditorLayer() : Layer("Sandbox2D")
 	{
-		m_CameraController = std::make_shared<OrthographicCameraController>(1280.0f / 720.0f, true);
 	}
 
 	void EditorLayer::OnAttach()
@@ -68,51 +67,7 @@ namespace Mayhem
 
 		m_ActiveScene = MakeRef<Scene>();
 
-		//class CameraController : public ScriptableEntity
-		//{
-		//public:
-		//	virtual void OnCreate() override
-		//	{
-
-		//	}
-
-		//	virtual void OnDestroy() override
-		//	{
-
-		//	}
-
-		//	virtual void OnUpdate(Timestep _ts) override
-		//	{
-		//		TransformComponent& trans = GetComponent<TransformComponent>();
-
-		//		float camSpeed = 1.f * GetComponent<CameraComponent>().m_Camera.GetOrthographicSize();
-		//		float dt = _ts.GetSeconds();
-
-		//		if (Input::IsKeyPressed(ENGINE_KEY_A))
-		//			trans.m_Translation.x -= camSpeed * dt;
-
-		//		if (Input::IsKeyPressed(ENGINE_KEY_D))
-		//			trans.m_Translation.x += camSpeed * dt;
-
-		//		if (Input::IsKeyPressed(ENGINE_KEY_S))
-		//			trans.m_Translation.y -= camSpeed * dt;
-
-		//		if (Input::IsKeyPressed(ENGINE_KEY_W))
-		//			trans.m_Translation.y += camSpeed * dt;
-		//	}
-		//};
-
-		//Entity camera = m_ActiveScene->CreateEntity("Main camera");
-		//camera.AddComponent<CameraComponent>();
-		//camera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-
-		//Entity square = m_ActiveScene->CreateEntity("Red square");
-		//SpriteRenderer& sprite = square.AddComponent<SpriteRenderer>(glm::vec4(0.8f, 0.2f, 0.3f, 1.0f));
-		//sprite.ChangeTexture(m_Texture);
-
-		//square = m_ActiveScene->CreateEntity("White square");
-		//sprite = square.AddComponent<SpriteRenderer>(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		//sprite.ChangeTexture(m_Texture);
+		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 		m_Hierarchy.SetContext(m_ActiveScene);
 
@@ -133,15 +88,14 @@ namespace Mayhem
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
 			m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_CameraController->OnResize(m_ViewportSize.x, m_ViewportSize.y);
+			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 
 			m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
 
 
 		// Update
-		if (m_ViewportFocused)
-			m_CameraController->OnUpdate(_timestep);
+		m_EditorCamera.OnUpdate(_timestep);
 
 		// Statistics
 		Renderer2D::ResetStats();
@@ -151,7 +105,7 @@ namespace Mayhem
 			m_FrameBuffer->Bind();
 
 			// Update Scene
-			m_ActiveScene->OnUpdate(_timestep);
+			m_ActiveScene->OnUpdateEditor(_timestep, m_EditorCamera);
 
 			m_FrameBuffer->Unbind();
 		}
@@ -283,8 +237,9 @@ namespace Mayhem
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
 		ImGui::Begin("Viewport");
-		m_ViewportFocused = ImGui::IsWindowFocused() && ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused);
+		m_ViewportFocused = ImGui::IsWindowFocused();
+		m_ViewportHovered = ImGui::IsWindowHovered();
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
@@ -306,25 +261,37 @@ namespace Mayhem
 			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, w, h);
 
 			// Camera
-			Entity camEntity = m_ActiveScene->GetPrimaryCameraEntity();
-			if (camEntity)
+			if (m_GizmoType != -1)
 			{
-				const auto& camera = camEntity.GetComponent<CameraComponent>();
-				const glm::mat4& camProj = camera.m_Camera.GetProjection();
-				glm::mat4 camView = glm::inverse(camEntity.GetComponent<TransformComponent>().GetTransform());
-			
+				const glm::mat4& camProj = m_EditorCamera.GetProjection();
+				glm::mat4 camView = m_EditorCamera.GetViewMatrix();
+
 				// Entity transform
 				auto& tc = selected.GetComponent<TransformComponent>();
 				glm::mat4 transform = tc.GetTransform();
 
+				// Snapping
+				bool snap = Input::IsKeyPressed(Key::LeftControl);
+				float snapValue = 0.5f;
+				if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+					snapValue = 45.f;
+
+				float snapValues[3] = { snapValue, snapValue , snapValue };
+
 				ImGuizmo::Manipulate(glm::value_ptr(camView), glm::value_ptr(camProj),
-					ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
-			
+					(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
+					nullptr, snap ? snapValues : nullptr);
+
 				if (ImGuizmo::IsUsing())
 				{
-					//glm::decompose()
+					glm::vec3 translation, rotation, scale;
+					Maths::DecomposeTransform(transform, translation, rotation, scale);
 
-					tc.m_Translation = transform[3];
+					glm::vec3 deltaRotation = rotation - tc.m_Rotation;
+
+					tc.m_Translation = translation;
+					tc.m_Rotation += deltaRotation;
+					tc.m_Scale = scale;
 				}
 			}
 		}
@@ -337,8 +304,7 @@ namespace Mayhem
 
 	void EditorLayer::OnEvent(Event& _e)
 	{
-		if (m_ViewportFocused)
-			m_CameraController->OnEvent(_e);
+		m_EditorCamera.OnEvent(_e);
 
 		EventDispatcher dispatcher(_e);
 		dispatcher.Dispatch<KeyPressedEvent>(ENGINE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
@@ -350,11 +316,11 @@ namespace Mayhem
 		if (_e.GetRepeatCount() > 0)
 			return false;
 
-		bool control = Input::IsKeyPressed(ENGINE_KEY_LEFT_CONTROL) || Input::IsKeyPressed(ENGINE_KEY_RIGHT_CONTROL);
-		bool shift = Input::IsKeyPressed(ENGINE_KEY_LEFT_SHIFT) || Input::IsKeyPressed(ENGINE_KEY_RIGHT_SHIFT);
+		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
 		switch (_e.GetKeyCode())
 		{
-		case ENGINE_KEY_N:
+		case Key::N:
 			if (control)
 			{
 				m_ActiveScene = MakeRef<Scene>();
@@ -362,7 +328,7 @@ namespace Mayhem
 				m_Hierarchy.SetContext(m_ActiveScene);
 			}
 			break;
-		case ENGINE_KEY_S:
+		case Key::S:
 			if (control && shift)
 			{
 				std::string path = FileDialogs::SaveFile("Mayhem Scene (*.mayhem)\0*.mayhem\0");
@@ -373,7 +339,7 @@ namespace Mayhem
 				}
 			}
 			break;
-		case ENGINE_KEY_O:
+		case Key::O:
 			if (control)
 			{
 				std::string path = FileDialogs::OpenFile("Mayhem Scene (*.mayhem)\0*.mayhem\0");
@@ -387,6 +353,20 @@ namespace Mayhem
 					serializer.Deserialize(path);
 				}
 			}
+			break;
+
+			// Gizmos
+		case Key::Q:
+			m_GizmoType = -1;
+			break;
+		case Key::W:
+			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+			break;
+		case Key::E:
+			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+			break;
+		case Key::R:
+			m_GizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
 		default:
 			break;

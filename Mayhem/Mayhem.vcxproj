@@ -159,6 +159,7 @@
     <ClInclude Include="src\Engine\Core\LayerStack.h" />
     <ClInclude Include="src\Engine\Core\Logger.h" />
     <ClInclude Include="src\Engine\Core\MouseButtonCodes.h" />
+    <ClInclude Include="src\Engine\Core\MouseCode.h" />
     <ClInclude Include="src\Engine\Core\Timestep.h" />
     <ClInclude Include="src\Engine\Core\Window.h" />
     <ClInclude Include="src\Engine\Events\ApplicationEvent.h" />
@@ -166,8 +167,10 @@
     <ClInclude Include="src\Engine\Events\KeyEvent.h" />
     <ClInclude Include="src\Engine\Events\MouseEvent.h" />
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Engine\Maths\Maths.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
     <ClInclude Include="src\Engine\Renderer\Camera\Camera.h" />
+    <ClInclude Include="src\Engine\Renderer\Camera\EditorCamera.h" />
     <ClInclude Include="src\Engine\Renderer\Camera\OrthographicCamera.h" />
     <ClInclude Include="src\Engine\Renderer\Camera\SceneCamera.h" />
     <ClInclude Include="src\Engine\Renderer\FrameBuffer.h" />
@@ -625,7 +628,9 @@
     <ClCompile Include="src\Engine\Core\Logger.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\Engine\Maths\Maths.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Engine\Renderer\Camera\EditorCamera.cpp" />
     <ClCompile Include="src\Engine\Renderer\Camera\OrthographicCamera.cpp" />
     <ClCompile Include="src\Engine\Renderer\Camera\SceneCamera.cpp" />
     <ClCompile Include="src\Engine\Renderer\FrameBuffer.cpp" />

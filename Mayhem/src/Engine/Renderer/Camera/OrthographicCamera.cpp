@@ -41,23 +41,23 @@ namespace Mayhem
 	{
 		float dt = _ts.GetSeconds();
 
-		if (Input::IsKeyPressed(ENGINE_KEY_A))
+		if (Input::IsKeyPressed(Key::A))
 			m_CameraPosition.x -= m_CameraSpeed * dt * m_ZoomLevel;
 
-		if (Input::IsKeyPressed(ENGINE_KEY_D))
+		if (Input::IsKeyPressed(Key::D))
 			m_CameraPosition.x += m_CameraSpeed * dt * m_ZoomLevel;
 
-		if (Input::IsKeyPressed(ENGINE_KEY_S))
+		if (Input::IsKeyPressed(Key::S))
 			m_CameraPosition.y -= m_CameraSpeed * dt * m_ZoomLevel;
 
-		if (Input::IsKeyPressed(ENGINE_KEY_W))
+		if (Input::IsKeyPressed(Key::W))
 			m_CameraPosition.y += m_CameraSpeed * dt * m_ZoomLevel;
 
 		if (m_Rotation)
 		{
-			if (Input::IsKeyPressed(ENGINE_KEY_Q))
+			if (Input::IsKeyPressed(Key::Q))
 				m_CameraRotation += m_CameraRotationSpeed * dt;
-			if (Input::IsKeyPressed(ENGINE_KEY_E))
+			if (Input::IsKeyPressed(Key::E))
 				m_CameraRotation -= m_CameraRotationSpeed * dt;
 
 			m_Camera.SetRotation(glm::vec3(m_CameraRotation));

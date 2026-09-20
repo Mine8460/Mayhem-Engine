@@ -127,6 +127,14 @@ namespace Mayhem
 		ResetBatchCount();
 	}
 
+	void Renderer2D::BeginScene(const EditorCamera& _cam)
+	{
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->SetUniformMat4("u_ViewProjection", _cam.GetViewProjection());
+
+		ResetBatchCount();
+	}
+
 	void Renderer2D::BeginScene(const Camera& _cam, const glm::mat4& _transform)
 	{
 		glm::mat4 viewProj = _cam.GetProjection() * glm::inverse(_transform);

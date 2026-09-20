@@ -30,7 +30,7 @@ namespace Mayhem
 		m_Registry.destroy(_entity);
 	}
 
-	void Scene::OnUpdate(Timestep _ts)
+	void Scene::OnUpdateRuntime(Timestep _ts)
 	{
 
 		// Update scripts, TODO : Move to Scene::OnScenePlay
@@ -95,6 +95,30 @@ namespace Mayhem
 		{
 			MAYHEM_CORE_WARN("No main camera");
 		}
+	}
+
+	void Scene::OnUpdateEditor(Timestep _ts, EditorCamera& _cam)
+	{
+		RenderCommand::Clear(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+		Renderer2D::BeginScene(_cam);
+
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
+
+		for (auto entity : group)
+		{
+			auto [transform, sprite] = group.get<TransformComponent, SpriteRenderer>(entity);
+
+			if (sprite.m_Texture)
+			{
+				Renderer2D::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color);
+			}
+			else
+			{
+				Renderer2D::DrawQuad(transform.GetTransform(), sprite.m_Color);
+			}
+		}
+
+		Renderer2D::EndScene();
 	}
 
 	void Scene::OnViewportSize(uint32_t _w, uint32_t _h)
