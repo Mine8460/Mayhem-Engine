@@ -19,6 +19,7 @@ IncludeDir["GLM"] = "Mayhem/vendor/glm"
 IncludeDir["stb"] = "Mayhem/vendor/stb_image"
 IncludeDir["entt"] = "Mayhem/vendor/entt"
 IncludeDir["yaml"] = "Mayhem/vendor/yaml/include"
+IncludeDir["ImGuizmo"] = "Mayhem/vendor/imguizmo"
 
 include "Mayhem/vendor/GLFW"
 include "Mayhem/vendor/GLAD"
@@ -46,6 +47,9 @@ project "Mayhem"
 		"%{prj.name}/vendor/stb_image/**.h",
 		"%{prj.name}/vendor/glm/glm/**.hpp",
 		"%{prj.name}/vendor/glm/glm/**.inl",
+
+		"%{prj.name}/vendor/imguizmo/ImGuizmo.h",
+		"%{prj.name}/vendor/imguizmo/ImGuizmo.cpp",
 	}
 
 	includedirs
@@ -58,6 +62,7 @@ project "Mayhem"
 		"%{IncludeDir.stb}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml}",
+		"%{IncludeDir.ImGuizmo}",
 	}
 
 	links
@@ -68,6 +73,9 @@ project "Mayhem"
 		"yaml-cpp",
 		"opengl32.lib"
 	}
+
+	filter "files:Mayhem/vendor/imguizmo/**.cpp"
+		enablepch "Off"
 
 	filter "system:windows"
 		systemversion "latest"

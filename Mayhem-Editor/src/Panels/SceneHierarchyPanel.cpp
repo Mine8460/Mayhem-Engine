@@ -243,9 +243,11 @@ namespace Mayhem
 
 			DrawComponent<TransformComponent>("Transform", _entity, [](TransformComponent& _component)
 				{
+					glm::vec3 rot = glm::degrees(_component.m_Rotation);
 					DrawVec3Control("Position", _component.m_Translation);
-					DrawVec3Control("Rotation", _component.m_Rotation);
+					DrawVec3Control("Rotation", rot);
 					DrawVec3Control("Scale", _component.m_Scale, 1.0f);
+					_component.m_Rotation = glm::radians(rot);
 				});
 
 			DrawComponent<CameraComponent>("Camera", _entity, [](CameraComponent& _component)

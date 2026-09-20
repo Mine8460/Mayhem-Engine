@@ -111,8 +111,6 @@ namespace Mayhem
 
 	bool SceneSerializer::Deserialize(const std::string& _path)
 	{
-		m_Scene->m_Registry.clear();
-
 		std::ifstream stream(_path);
 		std::stringstream strStream;
 		strStream << stream.rdbuf();

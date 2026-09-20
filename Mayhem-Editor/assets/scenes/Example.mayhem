@@ -2,13 +2,22 @@ Scene: Name
 Entities:
   - Entity: 12837192831273
     TagComponent:
-      Tag: Blue square
+      Tag: White square
     TransformComponent:
-      Translation: [0, 1, 1]
+      Translation: [1, 1, 1]
       Rotation: [0, 0, 0]
       Scale: [1, 5, 1]
     SpriteRenderer:
-      Color: [0, 0.415929317, 1, 1]
+      Color: [1, 1, 1, 1]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Red square
+    TransformComponent:
+      Translation: [2, 1, 1]
+      Rotation: [0, 0, 0]
+      Scale: [1, 5, 1]
+    SpriteRenderer:
+      Color: [1, 0, 0, 1]
   - Entity: 12837192831273
     TagComponent:
       Tag: Main camera
@@ -29,19 +38,10 @@ Entities:
       FixedAspectRatio: false
   - Entity: 12837192831273
     TagComponent:
-      Tag: Red square
+      Tag: Blue square
     TransformComponent:
-      Translation: [2, 1, 1]
+      Translation: [0, 1, 1]
       Rotation: [0, 0, 0]
       Scale: [1, 5, 1]
     SpriteRenderer:
-      Color: [1, 0, 0, 1]
-  - Entity: 12837192831273
-    TagComponent:
-      Tag: White square
-    TransformComponent:
-      Translation: [1, 1, 1]
-      Rotation: [0, 0, 0]
-      Scale: [1, 5, 1]
-    SpriteRenderer:
-      Color: [1, 1, 1, 1]
+      Color: [0, 0.415929317, 1, 1]

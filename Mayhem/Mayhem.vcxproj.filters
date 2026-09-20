@@ -25,6 +25,9 @@
     <Filter Include="src\Engine\Scene">
       <UniqueIdentifier>{AF1338A9-9B0C-57FB-C43E-3C80B0963607}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Utils">
+      <UniqueIdentifier>{F2A765A9-DEA0-84FB-07D3-6980F32A6407}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Platform">
       <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
     </Filter>
@@ -54,6 +57,9 @@
     </Filter>
     <Filter Include="vendor\glm\glm\gtx">
       <UniqueIdentifier>{B3A6A76B-9F8A-68C1-08EB-6214F4ED5243}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\imguizmo">
+      <UniqueIdentifier>{B36F5F1F-1FFB-CCE3-280C-50D8941629E4}</UniqueIdentifier>
     </Filter>
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
@@ -167,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\ScriptableEntity.h">
       <Filter>src\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Utils\PlatformUtils.h">
+      <Filter>src\Engine\Utils</Filter>
     </ClInclude>
     <ClInclude Include="src\Enpch.h">
       <Filter>src</Filter>
@@ -1455,6 +1464,9 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
+    <ClInclude Include="vendor\imguizmo\ImGuizmo.h">
+      <Filter>vendor\imguizmo</Filter>
+    </ClInclude>
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
@@ -1553,8 +1565,14 @@
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
       <Filter>src\Platform\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp">
+      <Filter>src\Platform\Windows</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>src\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\imguizmo\ImGuizmo.cpp">
+      <Filter>vendor\imguizmo</Filter>
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>

@@ -18,6 +18,7 @@ namespace Mayhem
 		void OnUpdate(Timestep _timestep) override;
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& _e) override;
+		virtual bool OnKeyPressed(KeyPressedEvent& _e);
 
 	private:
 

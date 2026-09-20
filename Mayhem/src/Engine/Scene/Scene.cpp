@@ -115,6 +115,23 @@ namespace Mayhem
 		}
 	}
 
+	void Scene::RemoveAllEntities(void)
+	{
+		m_Registry.clear();
+	}
+
+	Entity Scene::GetPrimaryCameraEntity()
+	{
+		auto view = m_Registry.view<CameraComponent>();
+		auto viewEach = view.each();
+		for (auto [entity, camera] : viewEach)
+		{
+			if (camera.m_Primary)
+				return Entity{ entity, this };
+		}
+		return Entity{ entt::null, this };
+	}
+
 	void Scene::OnComponentAdded(Entity entity, Component* component)
 	{
 			CameraComponent* comp = dynamic_cast<CameraComponent*>(component);

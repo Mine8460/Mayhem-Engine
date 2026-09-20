@@ -5,7 +5,8 @@
 #include <entt.hpp>
 #include <Engine/Scene/SceneSerializer.h>
 
-
+#include <Engine/Utils/PlatformUtils.h>
+#include <imguizmo/ImGuizmo.h>
 
 #define PROFILE_FUNCTION(name) Timer timer##__LINE__(name, [&](ProfileResult _result) {m_ProfileResults.push_back(_result); })
 
@@ -217,17 +218,35 @@ namespace Mayhem
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Save"))
+				if (ImGui::MenuItem("New", "Ctrl + N"))
 				{
-					SceneSerializer serializer(m_ActiveScene);
-					serializer.Serialize("assets/scenes/Example.mayhem");
-					//serializer.Deserialize("assets/scenes/Example.mayhem");
+					m_ActiveScene = MakeRef<Scene>();
+					m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+					m_Hierarchy.SetContext(m_ActiveScene);
 				}
-				if (ImGui::MenuItem("Open"))
+
+				if (ImGui::MenuItem("Save as...", "Ctrl + Shift + S"))
 				{
-					SceneSerializer serializer(m_ActiveScene);
-					//serializer.Serialize("assets/scenes/Example.mayhem");
-					serializer.Deserialize("assets/scenes/Example.mayhem");
+					std::string path = FileDialogs::SaveFile("Mayhem Scene (*.mayhem)\0*.mayhem\0");
+					if (!path.empty())
+					{
+						SceneSerializer serializer(m_ActiveScene);
+						serializer.Serialize(path);
+					}
+				}
+
+				if (ImGui::MenuItem("Open...", "Ctrl + 0"))
+				{
+					std::string path = FileDialogs::OpenFile("Mayhem Scene (*.mayhem)\0*.mayhem\0");
+					if (!path.empty())
+					{
+						m_ActiveScene = MakeRef<Scene>();
+						m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+						m_Hierarchy.SetContext(m_ActiveScene);
+
+						SceneSerializer serializer(m_ActiveScene);
+						serializer.Deserialize(path);
+					}
 				}
 
 				ImGui::Separator();
@@ -274,6 +293,42 @@ namespace Mayhem
 
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 		ImGui::Image((void*)textureID, ImVec2{ viewportPanelSize.x,viewportPanelSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+
+		// Gizmos
+		Entity selected = m_Hierarchy.GetSelectedEntity();
+		if (selected)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			float w = (float)ImGui::GetWindowWidth();
+			float h = (float)ImGui::GetWindowHeight();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, w, h);
+
+			// Camera
+			Entity camEntity = m_ActiveScene->GetPrimaryCameraEntity();
+			if (camEntity)
+			{
+				const auto& camera = camEntity.GetComponent<CameraComponent>();
+				const glm::mat4& camProj = camera.m_Camera.GetProjection();
+				glm::mat4 camView = glm::inverse(camEntity.GetComponent<TransformComponent>().GetTransform());
+			
+				// Entity transform
+				auto& tc = selected.GetComponent<TransformComponent>();
+				glm::mat4 transform = tc.GetTransform();
+
+				ImGuizmo::Manipulate(glm::value_ptr(camView), glm::value_ptr(camProj),
+					ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
+			
+				if (ImGuizmo::IsUsing())
+				{
+					//glm::decompose()
+
+					tc.m_Translation = transform[3];
+				}
+			}
+		}
+
 		ImGui::End();
 		ImGui::PopStyleVar();
 
@@ -284,5 +339,57 @@ namespace Mayhem
 	{
 		if (m_ViewportFocused)
 			m_CameraController->OnEvent(_e);
+
+		EventDispatcher dispatcher(_e);
+		dispatcher.Dispatch<KeyPressedEvent>(ENGINE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+	}
+
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& _e)
+	{
+		// Shortcuts
+		if (_e.GetRepeatCount() > 0)
+			return false;
+
+		bool control = Input::IsKeyPressed(ENGINE_KEY_LEFT_CONTROL) || Input::IsKeyPressed(ENGINE_KEY_RIGHT_CONTROL);
+		bool shift = Input::IsKeyPressed(ENGINE_KEY_LEFT_SHIFT) || Input::IsKeyPressed(ENGINE_KEY_RIGHT_SHIFT);
+		switch (_e.GetKeyCode())
+		{
+		case ENGINE_KEY_N:
+			if (control)
+			{
+				m_ActiveScene = MakeRef<Scene>();
+				m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+				m_Hierarchy.SetContext(m_ActiveScene);
+			}
+			break;
+		case ENGINE_KEY_S:
+			if (control && shift)
+			{
+				std::string path = FileDialogs::SaveFile("Mayhem Scene (*.mayhem)\0*.mayhem\0");
+				if (!path.empty())
+				{
+					SceneSerializer serializer(m_ActiveScene);
+					serializer.Serialize(path);
+				}
+			}
+			break;
+		case ENGINE_KEY_O:
+			if (control)
+			{
+				std::string path = FileDialogs::OpenFile("Mayhem Scene (*.mayhem)\0*.mayhem\0");
+				if (!path.empty())
+				{
+					m_ActiveScene = MakeRef<Scene>();
+					m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+					m_Hierarchy.SetContext(m_ActiveScene);
+
+					SceneSerializer serializer(m_ActiveScene);
+					serializer.Deserialize(path);
+				}
+			}
+			break;
+		default:
+			break;
+		}
 	}
 }

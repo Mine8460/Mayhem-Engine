@@ -19,6 +19,9 @@ namespace Mayhem
 
 		void OnUpdate(Timestep _ts);
 		void OnViewportSize(uint32_t _w, uint32_t _h);
+
+		void RemoveAllEntities(void);
+		Entity GetPrimaryCameraEntity();
 	private:
 		void OnComponentAdded(Entity entity, Component* component);
 

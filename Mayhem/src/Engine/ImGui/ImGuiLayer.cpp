@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include <Engine/Core/Application.h>
+#include <ImGuizmo.h>
 
 namespace Mayhem
 {
@@ -76,6 +77,7 @@ namespace Mayhem
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiLayer::End()
@@ -101,41 +103,11 @@ namespace Mayhem
 	{
 		auto& colors = ImGui::GetStyle().Colors;
 
-		//// Window
-		//colors[ImGuiCol_WindowBg] = ImVec4{ 0.043f, 0.039f, 0.059f, 1.0f };
-
-		//// Headers
-		//colors[ImGuiCol_Header] = ImVec4{ 0.094f, 0.082f, 0.122f, 1.0f };
-		//colors[ImGuiCol_HeaderHovered] = ImVec4{ 0.145f, 0.125f, 0.184f, 1.0f };
-		//colors[ImGuiCol_HeaderActive] = ImVec4{ 0.188f, 0.149f, 0.239f, 1.0f };
-
-		//// Buttons
-		//colors[ImGuiCol_Button] = ImVec4{ 0.094f, 0.082f, 0.122f, 1.0f };
-		//colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
-		//colors[ImGuiCol_ButtonActive] = ImVec4{ 0.443f, 0.227f, 0.569f, 1.0f };
-
-		//// Frame BG
-		//colors[ImGuiCol_FrameBg] = ImVec4{ 0.082f, 0.075f, 0.102f, 1.0f };
-		//colors[ImGuiCol_FrameBgHovered] = ImVec4{ 0.129f, 0.110f, 0.161f, 1.0f };
-		//colors[ImGuiCol_FrameBgActive] = ImVec4{ 0.173f, 0.141f, 0.212f, 1.0f };
-
-		//// Tabs
-		//colors[ImGuiCol_Tab] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
-		//colors[ImGuiCol_TabHovered] = ImVec4{ 0.608f, 0.302f, 0.792f, 1.0f };
-		//colors[ImGuiCol_TabActive] = ImVec4{ 0.227f, 0.161f, 0.282f, 1.0f };
-		//colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
-		//colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.122f, 0.102f, 0.157f, 1.0f };
-
-		//// Title
-		//colors[ImGuiCol_TitleBg] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
-		//colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.094f, 0.075f, 0.122f, 1.0f };
-		//colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.071f, 0.063f, 0.086f, 1.0f };
-
 		// ============================================================
-// MAYHEM ENGINE - ImGui Theme
-// ============================================================
+		// MAYHEM ENGINE - ImGui Theme
+		// ============================================================
 
-// Main window
+		// Main window
 		colors[ImGuiCol_WindowBg] = ImVec4{ 0.043f, 0.039f, 0.059f, 1.0f };
 
 		// ============================================================
