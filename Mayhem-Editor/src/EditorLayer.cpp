@@ -6,7 +6,7 @@
 #include <Engine/Scene/SceneSerializer.h>
 
 #include <Engine/Utils/PlatformUtils.h>
-#include <imguizmo/ImGuizmo.h>
+#include <imguizmo/src/ImGuizmo.h>
 
 #define PROFILE_FUNCTION(name) Timer timer##__LINE__(name, [&](ProfileResult _result) {m_ProfileResults.push_back(_result); })
 

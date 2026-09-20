@@ -16,6 +16,9 @@
     <Filter Include="src\Engine\ImGui">
       <UniqueIdentifier>{BC1B88A8-A814-A7FA-D146-8C7FBD9E8606}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Maths">
+      <UniqueIdentifier>{FEA6CAA8-EA9F-E9FA-13D2-CE7FFF29C906}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
     </Filter>
@@ -61,6 +64,9 @@
     <Filter Include="vendor\imguizmo">
       <UniqueIdentifier>{B36F5F1F-1FFB-CCE3-280C-50D8941629E4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vendor\imguizmo\src">
+      <UniqueIdentifier>{4ACF419C-B630-1FAA-3F9E-655CABFE5569}</UniqueIdentifier>
+    </Filter>
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
@@ -96,6 +102,9 @@
     <ClInclude Include="src\Engine\Core\MouseButtonCodes.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Core\MouseCode.h">
+      <Filter>src\Engine\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Core\Timestep.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
@@ -117,10 +126,16 @@
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Maths\Maths.h">
+      <Filter>src\Engine\Maths</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Camera\Camera.h">
+      <Filter>src\Engine\Renderer\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Camera\EditorCamera.h">
       <Filter>src\Engine\Renderer\Camera</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Camera\OrthographicCamera.h">
@@ -1464,15 +1479,12 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
-    <ClInclude Include="vendor\imguizmo\ImGuizmo.h">
-      <Filter>vendor\imguizmo</Filter>
+    <ClInclude Include="vendor\imguizmo\src\ImGuizmo.h">
+      <Filter>vendor\imguizmo\src</Filter>
     </ClInclude>
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Maths\Maths.h" />
-    <ClInclude Include="src\Engine\Renderer\Camera\EditorCamera.h" />
-    <ClInclude Include="src\Engine\Core\MouseCode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1493,8 +1505,14 @@
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp">
       <Filter>src\Engine\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Maths\Maths.cpp">
+      <Filter>src\Engine\Maths</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp">
       <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\Camera\EditorCamera.cpp">
+      <Filter>src\Engine\Renderer\Camera</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Camera\OrthographicCamera.cpp">
       <Filter>src\Engine\Renderer\Camera</Filter>
@@ -1574,13 +1592,11 @@
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>src\Platform\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="vendor\imguizmo\ImGuizmo.cpp">
-      <Filter>vendor\imguizmo</Filter>
+    <ClCompile Include="vendor\imguizmo\src\ImGuizmo.cpp">
+      <Filter>vendor\imguizmo\src</Filter>
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Maths\Maths.cpp" />
-    <ClCompile Include="src\Engine\Renderer\Camera\EditorCamera.cpp" />
   </ItemGroup>
 </Project>

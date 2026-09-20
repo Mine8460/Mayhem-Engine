@@ -19,7 +19,7 @@ IncludeDir["GLM"] = "Mayhem/vendor/glm"
 IncludeDir["stb"] = "Mayhem/vendor/stb_image"
 IncludeDir["entt"] = "Mayhem/vendor/entt"
 IncludeDir["yaml"] = "Mayhem/vendor/yaml/include"
-IncludeDir["ImGuizmo"] = "Mayhem/vendor/imguizmo"
+IncludeDir["ImGuizmo"] = "Mayhem/vendor/imguizmo/src"
 
 include "Mayhem/vendor/GLFW"
 include "Mayhem/vendor/GLAD"
@@ -48,8 +48,8 @@ project "Mayhem"
 		"%{prj.name}/vendor/glm/glm/**.hpp",
 		"%{prj.name}/vendor/glm/glm/**.inl",
 
-		"%{prj.name}/vendor/imguizmo/ImGuizmo.h",
-		"%{prj.name}/vendor/imguizmo/ImGuizmo.cpp",
+		"%{prj.name}/vendor/imguizmo/src/ImGuizmo.h",
+		"%{prj.name}/vendor/imguizmo/src/ImGuizmo.cpp",
 	}
 
 	includedirs
