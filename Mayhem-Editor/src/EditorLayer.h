@@ -4,6 +4,7 @@
 #include <chrono>
 #include "Panels/SceneHierarchyPanel.h"
 #include <Engine/Renderer/Camera/EditorCamera.h>
+#include <imguizmo/src/ImGuizmo.h>
 
 namespace Mayhem
 {
@@ -34,6 +35,7 @@ namespace Mayhem
 
 		Ref<FrameBuffer> m_FrameBuffer;
 		glm::vec2 m_ViewportSize;
+		glm::vec2 m_ViewportBounds[2];
 
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
@@ -48,7 +50,7 @@ namespace Mayhem
 			float Time;
 		};
 
-		int m_GizmoType = 0;
+		int m_GizmoType = (int)ImGuizmo::OPERATION::TRANSLATE;
 
 		std::vector<ProfileResult> m_ProfileResults;
 
