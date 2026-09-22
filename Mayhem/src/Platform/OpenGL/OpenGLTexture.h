@@ -25,6 +25,7 @@ namespace Mayhem
 			return m_RendererID == ((OpenGLTexture2D&)_other).m_RendererID;
 		}
 
+		virtual std::string GetPath() override { return m_Path; }
 		virtual glm::vec2* GetTextureCoords() override { return m_TextureCoords; }
 
 	private:
@@ -37,7 +38,6 @@ namespace Mayhem
 			{ 1.0f, 1.0f },
 			{ 0.0f, 1.0f },
 		};
-
 		GLenum m_InternalFormat, m_Format;
 	};
 }

@@ -33,4 +33,10 @@ namespace Mayhem
 	{
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
+
+	template<typename T>
+	class Array
+	{
+
+	};
 }

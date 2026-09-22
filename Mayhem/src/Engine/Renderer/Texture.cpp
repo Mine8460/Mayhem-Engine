@@ -3,6 +3,7 @@
 
 #include <Engine/Renderer/RendererAPI.h>
 #include <Platform/OpenGL/OpenGLTexture.h>
+#include <Engine/Core/AssetsManager.h>
 
 namespace Mayhem
 {
@@ -18,6 +19,10 @@ namespace Mayhem
 		return nullptr;
 	}
 	Ref<Texture2D> Texture2D::Create(const std::string& _path)
+	{
+		return AssetsManager::GetInstance()->GetTexture(_path);
+	}
+	Ref<Texture2D> Texture2D::CreateFromAssetsManager(const std::string& _path)
 	{
 		switch (RendererAPI::GetAPI())
 		{

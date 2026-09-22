@@ -12,6 +12,7 @@ namespace Mayhem
 
 		const Ref<Texture2D> GetTexture() const { return m_Texture; }
 		virtual glm::vec2* GetTextureCoords() override { return m_TexCoords; }
+		virtual std::string GetPath() override { return ""; }
 
 		static Ref<SubTexture2D> CreateFromCoords(const Ref<Texture2D>& _texture, const glm::vec2& _coords, const glm::vec2& _spriteSize);
 		static std::vector<Ref<SubTexture2D>> CreateAllSpriteSheet(const Ref<Texture2D>& _texture, const glm::vec2& _spriteSize);

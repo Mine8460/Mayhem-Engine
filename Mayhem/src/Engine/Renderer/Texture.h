@@ -31,7 +31,12 @@ namespace Mayhem
 		static Ref<Texture2D> Create(uint32_t _w, uint32_t _h);
 		static Ref<Texture2D> Create(const std::string& _path);
 
+		virtual std::string GetPath() = 0;
 		virtual glm::vec2* GetTextureCoords() { return nullptr; }
 		
+	private:
+		static Ref<Texture2D> CreateFromAssetsManager(const std::string& _path);
+
+		friend class AssetsManager;
 	};
 }

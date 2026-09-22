@@ -3,26 +3,35 @@
 #include <Engine.h>
 #include <chrono>
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 #include <Engine/Renderer/Camera/EditorCamera.h>
 #include <imguizmo/src/ImGuizmo.h>
 
 namespace Mayhem
 {
-
 	class EditorLayer : public Layer
 	{
 	public:
+		enum SceneState
+		{
+			Editor,
+			Runtime,
+		};
+
 		EditorLayer();
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
 
 		void OnUpdate(Timestep _timestep) override;
+		virtual void UI_Toolbar();
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& _e) override;
 		virtual bool OnKeyPressed(KeyPressedEvent& _e);
 		virtual bool OnMousePressed(MouseButtonPressedEvent& _e);
 
+		void OnScenePlay();
+		void OnSceneStop();
 	private:
 
 	private:
@@ -57,7 +66,10 @@ namespace Mayhem
 
 		std::vector<ProfileResult> m_ProfileResults;
 
+		SceneState m_SceneState = SceneState::Editor;
+
 		// Panels
 		SceneHierarchyPanel m_Hierarchy;
+		ContentBrowserPanel m_ContentBrowser;
 	};
 }

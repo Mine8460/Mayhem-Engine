@@ -152,15 +152,15 @@ namespace Mayhem
 
 					auto camProps = cam["Camera"];
 					cc.m_Camera.SetProjectionType((SceneCamera::ProjectionType)camProps["ProjectionType"].as<int>());
-					
+
 					cc.m_Camera.SetFOV(camProps["PerspectiveFOV"].as<float>());
 					cc.m_Camera.SetPerspectiveFarClip(camProps["PerspectiveNear"].as<float>());
 					cc.m_Camera.SetPerspectiveFarClip(camProps["PerspectiveFar"].as<float>());
-					
+
 					cc.m_Camera.SetOrthographicSize(camProps["OrthographicSize"].as<float>());
 					cc.m_Camera.SetOrthographicNearClip(camProps["OrthographicNear"].as<float>());
 					cc.m_Camera.SetOrthographicFarClip(camProps["OrthographicFar"].as<float>());
-				
+
 					cc.m_Primary = cam["Primary"].as<bool>();
 					cc.m_FixedAspectRatio = cam["FixedAspectRatio"].as<bool>();
 				}
@@ -170,6 +170,10 @@ namespace Mayhem
 				{
 					auto& sc = deserializedEntity.AddComponent<SpriteRenderer>();
 					sc.m_Color = sprite["Color"].as<glm::vec4>();
+					std::string path = sprite["Texture"].as<std::string>();
+					if (path != "None")
+						sc.m_Texture = Texture2D::Create(path);
+					sc.m_Tiling = sprite["Tiling"].as<float>();
 				}
 			}
 		}
@@ -246,6 +250,11 @@ namespace Mayhem
 
 			auto& sprite = _entity.GetComponent<SpriteRenderer>();
 			_out << YAML::Key << "Color" << YAML::Value << sprite.m_Color;
+			if (sprite.m_Texture)
+				_out << YAML::Key << "Texture" << YAML::Value << sprite.m_Texture->GetPath();
+			else
+				_out << YAML::Key << "Texture" << YAML::Value << "None";
+			_out << YAML::Key << "Tiling" << YAML::Value << sprite.m_Tiling;
 
 			_out << YAML::EndMap;
 		}

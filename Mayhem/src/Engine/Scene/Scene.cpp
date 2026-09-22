@@ -32,8 +32,6 @@ namespace Mayhem
 
 	void Scene::OnUpdateRuntime(Timestep _ts)
 	{
-
-		// Update scripts, TODO : Move to Scene::OnScenePlay
 		{
 			m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& nsc)
 				{
@@ -79,14 +77,7 @@ namespace Mayhem
 			{
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRenderer>(entity);
 
-				if (sprite.m_Texture)
-				{
-					Renderer2D::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color);
-				}
-				else
-				{
-					Renderer2D::DrawQuad(transform.GetTransform(), sprite.m_Color);
-				}
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (uint32_t)entity);
 			}
 
 			Renderer2D::EndScene();

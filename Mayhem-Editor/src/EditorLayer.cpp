@@ -56,8 +56,8 @@ namespace Mayhem
 	{
 		m_Texture = Texture2D::Create("assets/textures/Checkerboard.png");
 		m_AlphaTexture = Texture2D::Create("assets/textures/AlphaCheckerboard.png");
-		m_SpriteSheet = Texture2D::Create("assets/game/Spritesheet.png");
-		m_Sprites = SubTexture2D::CreateAllSpriteSheet(m_SpriteSheet, { 64.f,64.f });
+		//m_SpriteSheet = Texture2D::Create("assets/game/Spritesheet.png");
+		//m_Sprites = SubTexture2D::CreateAllSpriteSheet(m_SpriteSheet, { 64.f,64.f });
 
 		FrameBufferSpecification spec;
 		spec.Attachment = { FrameBufferTextureFormat::RGBA8, FrameBufferTextureFormat::RED_INTEGER, FrameBufferTextureFormat::Depth };
@@ -70,8 +70,6 @@ namespace Mayhem
 		m_EditorCamera = EditorCamera(45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 		m_Hierarchy.SetContext(m_ActiveScene);
-
-
 	}
 
 	void EditorLayer::OnDetach()
@@ -95,7 +93,7 @@ namespace Mayhem
 
 
 		// Update
-		m_EditorCamera.OnUpdate(_timestep);
+		
 
 		// Statistics
 		Renderer2D::ResetStats();
@@ -108,7 +106,16 @@ namespace Mayhem
 			m_FrameBuffer->ClearAttachement(1, -1);
 
 			// Update Scene
-			m_ActiveScene->OnUpdateEditor(_timestep, m_EditorCamera);
+			if (m_SceneState == SceneState::Editor)
+			{
+				m_EditorCamera.OnUpdate(_timestep);
+
+				m_ActiveScene->OnUpdateEditor(_timestep, m_EditorCamera);
+			}
+			else if (m_SceneState == SceneState::Runtime)
+			{
+				m_ActiveScene->OnUpdateRuntime(_timestep);
+			}
 
 			auto [mx, my] = ImGui::GetMousePos();
 			mx -= m_ViewportBounds[0].x;
@@ -138,6 +145,29 @@ namespace Mayhem
 
 			m_FrameBuffer->Unbind();
 		}
+	}
+
+	void EditorLayer::UI_Toolbar()
+	{
+		ImGui::Begin("##Toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+		float size = ImGui::GetWindowHeight() - 20.0f;
+		Ref<Texture2D> texture;
+		if (m_SceneState == SceneState::Editor)
+			texture = Texture2D::Create("assets/icons/PlayButton.png");
+		else if (m_SceneState == SceneState::Runtime)
+			texture = Texture2D::Create("assets/icons/StopButton.png");
+
+		if (ImGui::ImageButton("Play", (ImTextureID)texture->GetRendererID(), ImVec2(size, size), { 0.f ,1.f }, { 1.f, 0.f }))
+		{
+			if (m_SceneState == SceneState::Editor)
+				m_SceneState = SceneState::Runtime;
+			else if (m_SceneState == SceneState::Runtime)
+				m_SceneState = SceneState::Editor;
+		}
+
+		ImGui::End();
+
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -245,6 +275,7 @@ namespace Mayhem
 		}
 
 		m_Hierarchy.OnImGuiRender();
+		m_ContentBrowser.OnImGuiRender();
 
 		ImGui::Begin("Profiling");
 		Renderer2D::Statistics stats = Renderer2D::GetStats();
@@ -282,6 +313,26 @@ namespace Mayhem
 		uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 		ImGui::Image((void*)textureID, ImVec2{ viewportPanelSize.x,viewportPanelSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+
+				m_ActiveScene = MakeRef<Scene>();
+				m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+				m_Hierarchy.SetContext(m_ActiveScene);
+
+				SceneSerializer serializer(m_ActiveScene);
+				std::wstring wideString = path;
+				std::string pathString(wideString.begin(), wideString.end());
+				serializer.Deserialize(pathString);
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
 		// Gizmos
 		Entity selected = m_Hierarchy.GetSelectedEntity();
 		if (selected)
@@ -331,6 +382,8 @@ namespace Mayhem
 		ImGui::PopStyleVar();
 
 		ImGui::End();
+
+		UI_Toolbar();
 	}
 
 	void EditorLayer::OnEvent(Event& _e)
@@ -409,7 +462,7 @@ namespace Mayhem
 	{
 		if (ImGuizmo::GetHoveredHandleType() == ImGuizmo::MOVETYPE::MT_NONE)
 		{
-			if (!Mayhem::Input::IsKeyPressed(Mayhem::Key::LeftAlt))
+			if (!Mayhem::Input::IsKeyPressed(Mayhem::Key::LeftAlt) && m_ViewportHovered)
 			{
 				if (_e.GetMouseButton() == Mayhem::Mouse::Button0)
 				{
@@ -419,5 +472,13 @@ namespace Mayhem
 		}
 
 		return false;
+	}
+
+	void EditorLayer::OnScenePlay()
+	{
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
 	}
 }
