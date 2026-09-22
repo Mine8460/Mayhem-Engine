@@ -14,10 +14,10 @@ namespace Mayhem
 		RED_INTEGER,
 
 		// Depth/stencil
-		DEPTH28STENCIL8,
+		DEPTH24STENCIL8,
 		
 		// Defaults
-		Depth = DEPTH28STENCIL8,
+		Depth = DEPTH24STENCIL8,
 	};
 
 	struct FrameBufferTextureSpecification
@@ -58,6 +58,8 @@ namespace Mayhem
 		virtual void Unbind() = 0;
 		virtual void Resize(uint32_t _w, uint32_t _h) = 0;
 		virtual int ReadPixel(uint32_t _index, int _x, int _y) = 0;
+
+		virtual void ClearAttachement(uint32_t _index, int _value) = 0;
 
 		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
 

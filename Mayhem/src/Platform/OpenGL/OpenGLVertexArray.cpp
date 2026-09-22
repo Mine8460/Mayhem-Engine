@@ -53,15 +53,26 @@ namespace Mayhem
 		uint32_t index = 0;
 		for (const auto& element : _buffer->GetLayout())
 		{
-
 			glEnableVertexAttribArray(index);
 
+			if (element.Type == ShaderDataType::Int || element.Type == ShaderDataType::Int2 || element.Type == ShaderDataType::Int3 || element.Type == ShaderDataType::Int4)
+			{
+				glVertexAttribIPointer(index,
+					element.GetComponentCount(),
+					ShaderDataTypeToOpenGLBaseType(element.Type),
+					_buffer->GetLayout().GetStride(),
+					(const void*)element.Offset);
+			}
+			else
+			{
 			glVertexAttribPointer(index,
 				element.GetComponentCount(),
 				ShaderDataTypeToOpenGLBaseType(element.Type),
 				element.Normalized ? GL_TRUE : GL_FALSE,
 				_buffer->GetLayout().GetStride(),
 				(const void*)element.Offset);
+			}
+
 
 			index++;
 		}

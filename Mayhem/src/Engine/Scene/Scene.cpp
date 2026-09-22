@@ -99,7 +99,6 @@ namespace Mayhem
 
 	void Scene::OnUpdateEditor(Timestep _ts, EditorCamera& _cam)
 	{
-		RenderCommand::Clear(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 		Renderer2D::BeginScene(_cam);
 
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
@@ -107,15 +106,7 @@ namespace Mayhem
 		for (auto entity : group)
 		{
 			auto [transform, sprite] = group.get<TransformComponent, SpriteRenderer>(entity);
-
-			if (sprite.m_Texture)
-			{
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color);
-			}
-			else
-			{
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.m_Color);
-			}
+			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (uint32_t)entity);
 		}
 
 		Renderer2D::EndScene();

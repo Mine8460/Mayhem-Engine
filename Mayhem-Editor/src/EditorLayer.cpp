@@ -6,6 +6,7 @@
 #include <Engine/Scene/SceneSerializer.h>
 
 #include <Engine/Utils/PlatformUtils.h>
+#include <Engine/Core/MouseCode.h>
 
 #define PROFILE_FUNCTION(name) Timer timer##__LINE__(name, [&](ProfileResult _result) {m_ProfileResults.push_back(_result); })
 
@@ -102,6 +103,9 @@ namespace Mayhem
 		{
 			//PROFILE_FUNCTION("Editor::OnRender");
 			m_FrameBuffer->Bind();
+			RenderCommand::Clear(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+
+			m_FrameBuffer->ClearAttachement(1, -1);
 
 			// Update Scene
 			m_ActiveScene->OnUpdateEditor(_timestep, m_EditorCamera);
@@ -118,8 +122,18 @@ namespace Mayhem
 
 			if (mouseX >= 0 && mouseY >= 00 && mouseX < (int)viewportW && mouseY < (int)viewportH)
 			{
-				int pixel = m_FrameBuffer->ReadPixel(1, mouseX, mouseY);
-				MAYHEM_CORE_INFO(std::to_string(pixel).c_str())
+				if (m_ViewportHovered)
+				{
+					int id = m_FrameBuffer->ReadPixel(1, mouseX, mouseY);
+					if (id == -1)
+					{
+						m_HoveredEntity = { entt::null, m_ActiveScene.get() };
+					}
+					else
+					{
+						m_HoveredEntity = { (entt::entity)id, m_ActiveScene.get() };
+					}
+				}
 			}
 
 			m_FrameBuffer->Unbind();
@@ -251,8 +265,12 @@ namespace Mayhem
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
-		ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_MenuBar);
-		auto viewportOffset = ImGui::GetCursorPos(); // Includes tab bar
+		ImGui::Begin("Viewport");
+		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+		auto viewportOffset = ImGui::GetWindowPos();
+		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
@@ -262,20 +280,8 @@ namespace Mayhem
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
 		uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
-
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 		ImGui::Image((void*)textureID, ImVec2{ viewportPanelSize.x,viewportPanelSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
-		auto windowSize = ImGui::GetWindowSize();
-		ImVec2 minBound = ImGui::GetWindowPos();
-		minBound.x += viewportOffset.x;
-		minBound.y += viewportOffset.y;
-
-		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
-		m_ViewportBounds[0] = { minBound.x, minBound.y };
-		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
-
-
-
 		// Gizmos
 		Entity selected = m_Hierarchy.GetSelectedEntity();
 		if (selected)
@@ -283,9 +289,7 @@ namespace Mayhem
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
 
-			float w = (float)ImGui::GetWindowWidth();
-			float h = (float)ImGui::GetWindowHeight();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, w, h);
+			ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
 
 			// Camera
 			if (m_GizmoType != -1)
@@ -335,6 +339,7 @@ namespace Mayhem
 
 		EventDispatcher dispatcher(_e);
 		dispatcher.Dispatch<KeyPressedEvent>(ENGINE_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(ENGINE_BIND_EVENT_FN(EditorLayer::OnMousePressed));
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& _e)
@@ -398,5 +403,21 @@ namespace Mayhem
 		default:
 			break;
 		}
+	}
+
+	bool EditorLayer::OnMousePressed(MouseButtonPressedEvent& _e)
+	{
+		if (ImGuizmo::GetHoveredHandleType() == ImGuizmo::MOVETYPE::MT_NONE)
+		{
+			if (!Mayhem::Input::IsKeyPressed(Mayhem::Key::LeftAlt))
+			{
+				if (_e.GetMouseButton() == Mayhem::Mouse::Button0)
+				{
+					m_Hierarchy.SetSelectedEntity(m_HoveredEntity);
+				}
+			}
+		}
+
+		return false;
 	}
 }

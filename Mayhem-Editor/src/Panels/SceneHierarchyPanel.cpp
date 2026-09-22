@@ -315,6 +315,7 @@ namespace Mayhem
 			DrawComponent<SpriteRenderer>("Sprite Renderer", _entity, [](SpriteRenderer& _component)
 				{
 					ImGui::ColorEdit4("Color", glm::value_ptr(_component.m_Color));
+					ImGui::DragFloat("Tiling factor", &_component.m_Tiling, 0.1f, 0.1f, 1000.f);
 				});
 		}
 	}

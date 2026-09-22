@@ -4,6 +4,7 @@
 #include "Camera/EditorCamera.h"
 #include "Texture.h"
 #include "SubTexture2D.h"
+#include <Engine/Scene/Components.h>
 
 namespace Mayhem
 {
@@ -40,14 +41,9 @@ namespace Mayhem
 		static void DrawQuad(const glm::mat4& _transform, const glm::vec4 _color);
 		static void DrawQuad(const glm::mat4& _transform, const Ref<Texture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
 		static void DrawQuad(const glm::mat4& _transform, const Ref<SubTexture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
-		
-		static void DrawRotatedQuad(const glm::vec2& _pos, const glm::vec2& _size, float _rotation, const glm::vec4 _color);
-		static void DrawRotatedQuad(const glm::vec3& _pos, const glm::vec2& _size, float _rotation, const glm::vec4 _color);
-		static void DrawRotatedQuad(const glm::vec2& _pos, const glm::vec2& _size, float _rotation, const Ref<Texture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
-		static void DrawRotatedQuad(const glm::vec3& _pos, const glm::vec2& _size, float _rotation, const Ref<Texture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
-		static void DrawRotatedQuad(const glm::vec2& _pos, const glm::vec2& _size, float _rotation, const Ref<SubTexture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
-		static void DrawRotatedQuad(const glm::vec3& _pos, const glm::vec2& _size, float _rotation, const Ref<SubTexture2D> _texture, const glm::vec4& _color = { 1.0f, 1.0f, 1.0f, 1.0f }, float _tiling = 1.0f);
 	
+		static void DrawSprite(const glm::mat4& _transform, SpriteRenderer& _src, unsigned int _entityID);
+
 		static Statistics GetStats(void);
 		static void ResetStats();
 

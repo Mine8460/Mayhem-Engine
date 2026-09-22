@@ -99,9 +99,6 @@
     <ClInclude Include="src\Engine\Core\Logger.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Core\MouseButtonCodes.h">
-      <Filter>src\Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Core\MouseCode.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>

@@ -6,7 +6,7 @@
 
 #include "Engine/Core/Input.h"
 #include "Engine/Core/KeyCode.h"
-#include "Engine/Core/MouseButtonCodes.h"
+#include "Engine/Core/MouseCode.h"
 
 #include "Engine/Core/Layer.h"
 #include "Engine/Core/Logger.h"

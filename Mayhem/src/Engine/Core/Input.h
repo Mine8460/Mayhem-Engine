@@ -2,7 +2,7 @@
 
 #include <Engine/Core/Core.h>
 #include "KeyCode.h"
-#include "MouseButtonCodes.h"
+#include "MouseCode.h"
 
 namespace Mayhem
 {

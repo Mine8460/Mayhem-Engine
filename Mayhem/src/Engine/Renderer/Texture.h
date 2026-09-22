@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <Engine/Core/Core.h>
+#include <glm/glm.hpp>
 
 namespace Mayhem
 {
@@ -30,6 +31,7 @@ namespace Mayhem
 		static Ref<Texture2D> Create(uint32_t _w, uint32_t _h);
 		static Ref<Texture2D> Create(const std::string& _path);
 
+		virtual glm::vec2* GetTextureCoords() { return nullptr; }
 		
 	};
 }

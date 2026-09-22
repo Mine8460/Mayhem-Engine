@@ -17,6 +17,7 @@ namespace Mayhem
 		virtual void Unbind() override;
 		virtual void Resize(uint32_t _w, uint32_t _h) override;
 		virtual int ReadPixel(uint32_t _index, int _x, int _y) override;
+		virtual void ClearAttachement(uint32_t _index, int _value) override;
 	private:
 
 		uint32_t m_RendererID = 0;

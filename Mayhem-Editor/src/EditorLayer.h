@@ -21,6 +21,7 @@ namespace Mayhem
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& _e) override;
 		virtual bool OnKeyPressed(KeyPressedEvent& _e);
+		virtual bool OnMousePressed(MouseButtonPressedEvent& _e);
 
 	private:
 
@@ -36,6 +37,8 @@ namespace Mayhem
 		Ref<FrameBuffer> m_FrameBuffer;
 		glm::vec2 m_ViewportSize;
 		glm::vec2 m_ViewportBounds[2];
+
+		Entity m_HoveredEntity;
 
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;

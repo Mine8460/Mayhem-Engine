@@ -67,9 +67,22 @@ namespace Mayhem
 		{
 			switch (_format)
 			{
-			case FrameBufferTextureFormat::DEPTH28STENCIL8: return true;
+			case FrameBufferTextureFormat::DEPTH24STENCIL8: return true;
 			}
 			return false;
+		}
+
+		static GLenum MayhemTextureFormatToGL(FrameBufferTextureFormat _format)
+		{
+			switch (_format)
+			{
+			case Mayhem::FrameBufferTextureFormat::None: return GL_NONE;
+			case Mayhem::FrameBufferTextureFormat::RGBA8: return GL_RGBA8;
+			case Mayhem::FrameBufferTextureFormat::RED_INTEGER: return GL_RED_INTEGER;
+			case Mayhem::FrameBufferTextureFormat::DEPTH24STENCIL8: return GL_DEPTH24_STENCIL8;
+			}
+
+			return GL_NONE;
 		}
 	}
 
@@ -141,7 +154,7 @@ namespace Mayhem
 
 			switch (m_DepthAttachmentSpec.TextureFormat)
 			{
-			case FrameBufferTextureFormat::DEPTH28STENCIL8:
+			case FrameBufferTextureFormat::DEPTH24STENCIL8:
 				Utils::AttachDepthTexture(m_DepthAttachment, m_Spec.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_ATTACHMENT, m_Spec.Width, m_Spec.Height);
 				break;
 			}
@@ -164,7 +177,7 @@ namespace Mayhem
 	void OpenGLFrameBuffer::Bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
-		//glViewport(0, 0, m_Spec.Width, m_Spec.Height);
+		glViewport(0, 0, m_Spec.Width, m_Spec.Height);
 	}
 
 	void OpenGLFrameBuffer::Unbind()
@@ -201,6 +214,15 @@ namespace Mayhem
 		int pixelData;
 		glReadPixels(_x, _y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
 		return pixelData;
+	}
+
+	void OpenGLFrameBuffer::ClearAttachement(uint32_t _index, int _value)
+	{
+		MAYHEM_CORE_ASSERT(_index < m_ColorAttachments.size(), "");
+
+		auto& spec = m_ColorAttachmentsSpecs[_index];
+		glClearTexImage(m_ColorAttachments[_index], 0,
+			Utils::MayhemTextureFormatToGL(spec.TextureFormat), GL_INT, &_value);
 	}
 
 }

@@ -71,6 +71,7 @@ namespace Mayhem
 
 		glm::vec4 m_Color = glm::vec4(1.0f);
 		Ref<Texture2D> m_Texture;
+		float m_Tiling = 1.0f;
 	};
 
 	class CameraComponent : public Component

@@ -19,8 +19,6 @@ namespace Mayhem
 		template<typename T>
 		T& GetComponent()
 		{
-			MAYHEM_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
-
 			return m_Scene->m_Registry.get<T>(m_EntityHandle);
 		}
 
