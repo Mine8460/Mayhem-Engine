@@ -544,21 +544,57 @@ namespace Mayhem
 		if (s_Data.QuadIndexCount >= s_Data.MaxIndices)
 			EndScene();
 
-		constexpr size_t quadVertexCount = 4;
-		const float textureIndex = 0.0f; // White Texture
-		constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f },{ 1.0f, 0.0f },{ 1.0f, 1.0f },{ 0.0f, 1.0f } };
-
-		for (size_t i = 0; i < quadVertexCount; i++)
+		if (_src.m_Texture)
 		{
-			s_Data.QuadVertexBufferPtr->Position = _transform * s_Data.QuadVertexPositions[i];
-			s_Data.QuadVertexBufferPtr->Color = _src.m_Color;
-			s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr->TilingFactor = _src.m_Tiling;
-			s_Data.QuadVertexBufferPtr->EntityID = (int)_entityID;
-			s_Data.QuadVertexBufferPtr++;
-		}
+			constexpr size_t quadVertexCount = 4;
+			float textureIndex = 0.0f; // White Texture
 
+			for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
+			{
+				if (*s_Data.TextureSlots[i].get() == *_src.m_Texture.get())
+				{
+					textureIndex = (float)i;
+					break;
+				}
+			}
+
+			if (textureIndex == 0.0f)
+			{
+				textureIndex = (float)s_Data.TextureSlotIndex;
+				s_Data.TextureSlots[s_Data.TextureSlotIndex] = _src.m_Texture;
+				s_Data.TextureSlotIndex++;
+			}
+
+			glm::vec2* textureCoords = _src.m_Texture->GetTextureCoords();
+
+			for (size_t i = 0; i < quadVertexCount; i++)
+			{
+				s_Data.QuadVertexBufferPtr->Position = _transform * s_Data.QuadVertexPositions[i];
+				s_Data.QuadVertexBufferPtr->Color = _src.m_Color;
+				s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+				s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+				s_Data.QuadVertexBufferPtr->TilingFactor = _src.m_Tiling;
+				s_Data.QuadVertexBufferPtr->EntityID = (int)_entityID;
+				s_Data.QuadVertexBufferPtr++;
+			}
+		}
+		else
+		{
+			constexpr size_t quadVertexCount = 4;
+			float textureIndex = 0.0f; // White Texture
+			glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
+		
+			for (size_t i = 0; i < quadVertexCount; i++)
+			{
+				s_Data.QuadVertexBufferPtr->Position = _transform * s_Data.QuadVertexPositions[i];
+				s_Data.QuadVertexBufferPtr->Color = _src.m_Color;
+				s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
+				s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+				s_Data.QuadVertexBufferPtr->TilingFactor = _src.m_Tiling;
+				s_Data.QuadVertexBufferPtr->EntityID = (int)_entityID;
+				s_Data.QuadVertexBufferPtr++;
+			}
+		}
 
 		s_Data.QuadIndexCount += 6;
 
