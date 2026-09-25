@@ -21,7 +21,7 @@ namespace Mayhem
 	{
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TagComponent>(_name);
-		entity.AddComponent<TransformComponent>(glm::vec3(1.0f));
+		entity.AddComponent<TransformComponent>(glm::vec3(0.0f));
 		return entity;
 	}
 
