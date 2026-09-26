@@ -32,6 +32,9 @@ namespace Mayhem
 
 		void OnScenePlay();
 		void OnSceneStop();
+
+		void OpenScene(const std::filesystem::path& path);
+		void OpenScene();
 	private:
 
 	private:

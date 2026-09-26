@@ -197,6 +197,11 @@ namespace Mayhem
 	{
 		if (_entity)
 		{
+			if (_entity.HasComponent<IDComponent>())
+			{
+				ImGui::Text(std::to_string((uint32_t)_entity.GetUUID()).c_str());
+			}
+
 			if (_entity.HasComponent<TagComponent>())
 			{
 				auto& tag = _entity.GetComponent<TagComponent>().Tag;

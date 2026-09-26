@@ -3,7 +3,9 @@
 #include "Components.h"
 #include "Entity.h"
 #include <Engine/Renderer/Renderer2D.h>
+#include <Engine/Renderer/Renderer3D.h>
 #include <Engine/Renderer/RenderCommand.h>
+#include <Engine/Scene/ScriptableEntity.h>
 
 namespace Mayhem
 {
@@ -20,6 +22,16 @@ namespace Mayhem
 	Entity Scene::CreateEntity(const std::string& _name)
 	{
 		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<IDComponent>();
+		entity.AddComponent<TagComponent>(_name);
+		entity.AddComponent<TransformComponent>(glm::vec3(1.0f));
+		return entity;
+	}
+
+	Entity Scene::CreateEntityWithUUID(const std::string& _name, uint64_t _uuid)
+	{
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<IDComponent>(_uuid);
 		entity.AddComponent<TagComponent>(_name);
 		entity.AddComponent<TransformComponent>(glm::vec3(1.0f));
 		return entity;
@@ -90,6 +102,7 @@ namespace Mayhem
 
 	void Scene::OnUpdateEditor(Timestep _ts, EditorCamera& _cam)
 	{
+		Renderer3D::BeginScene(_cam);
 		Renderer2D::BeginScene(_cam);
 
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
@@ -98,8 +111,10 @@ namespace Mayhem
 		{
 			auto [transform, sprite] = group.get<TransformComponent, SpriteRenderer>(entity);
 			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (uint32_t)entity);
+			//Renderer3D::DrawCube(transform.GetTransform(), sprite.m_Color);
 		}
 
+		Renderer3D::EndScene();
 		Renderer2D::EndScene();
 	}
 
@@ -140,11 +155,11 @@ namespace Mayhem
 
 	void Scene::OnComponentAdded(Entity entity, Component* component)
 	{
-			CameraComponent* comp = dynamic_cast<CameraComponent*>(component);
+		CameraComponent* comp = dynamic_cast<CameraComponent*>(component);
 
-			if (comp)
-			{
-				comp->m_Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
-			}
+		if (comp)
+		{
+			comp->m_Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+		}
 	}
 }

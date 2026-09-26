@@ -1,13 +1,13 @@
 #pragma once
 
+#include <Engine/Renderer/Camera/SceneCamera.h>
+#include <Engine/Core/Timestep.h>
+#include <Engine/Renderer/SubTexture2D.h>
+#include <Engine/Core/UUID.h>
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <Engine/Renderer/Camera/SceneCamera.h>
-#include <Engine/Scene/ScriptableEntity.h>
-#include <Engine/Core/Timestep.h>
-#include <Engine/Renderer/SubTexture2D.h>
 
 namespace Mayhem
 {
@@ -30,6 +30,22 @@ namespace Mayhem
 
 		operator std::string& () { return Tag; }
 		operator const std::string& () const { return Tag; }
+	};
+
+	class IDComponent : public Component
+	{
+	public:
+		IDComponent() : m_ID()
+		{
+
+		}
+		IDComponent(uint64_t _uuid) : m_ID(_uuid)
+		{
+
+		}
+		IDComponent(const IDComponent&) = default;
+
+		UUID m_ID;
 	};
 
 	class TransformComponent : public Component
@@ -85,7 +101,7 @@ namespace Mayhem
 		bool m_FixedAspectRatio = false;
 	};
 
-	//class ScriptableEntity;
+	class ScriptableEntity;
 
 	class NativeScriptComponent : public Component
 	{

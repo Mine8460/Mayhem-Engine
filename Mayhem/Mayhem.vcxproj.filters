@@ -1483,6 +1483,8 @@
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\AssetsManager.h" />
+    <ClInclude Include="src\Engine\Core\UUID.h" />
+    <ClInclude Include="src\Engine\Renderer\Renderer3D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1597,5 +1599,7 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Core\AssetsManager.cpp" />
+    <ClCompile Include="src\Engine\Core\UUID.cpp" />
+    <ClCompile Include="src\Engine\Renderer\Renderer3D.cpp" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,24 @@
+Scene: Name
+Entities:
+  - Entity: 11964004779211975898
+    TagComponent:
+      Tag: Blue
+    TransformComponent:
+      Translation: [2, 1, 1]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRenderer:
+      Color: [0, 0.270270348, 1, 1]
+      Texture: None
+      Tiling: 1
+  - Entity: 14434871055520865948
+    TagComponent:
+      Tag: Red
+    TransformComponent:
+      Translation: [1, 1, 1]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRenderer:
+      Color: [1, 0, 0, 1]
+      Texture: None
+      Tiling: 1

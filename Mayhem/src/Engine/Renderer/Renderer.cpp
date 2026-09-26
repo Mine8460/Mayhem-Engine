@@ -1,6 +1,7 @@
 #include <Enpch.h>
 #include "Renderer.h"
 #include "Renderer2D.h"
+#include "Renderer3D.h"
 #include <Platform/OpenGL/OpenGLShader.h>
 
 namespace Mayhem
@@ -11,11 +12,13 @@ namespace Mayhem
 	{
 		RenderCommand::Init();
 		Renderer2D::Init();
+		Renderer3D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
 		Renderer2D::Shutdown();
+		Renderer3D::Shutdown();
 	}
 
 	void Renderer::OnWindowResize(uint32_t _w, uint32_t _h)

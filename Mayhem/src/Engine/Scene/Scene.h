@@ -16,6 +16,7 @@ namespace Mayhem
 		~Scene();
 
 		Entity CreateEntity(const std::string& _name = "Entity");
+		Entity CreateEntityWithUUID(const std::string& _name, uint64_t _uuid);
 		void DestroyEntity(Entity _entity);
 
 		void OnUpdateRuntime(Timestep _ts);

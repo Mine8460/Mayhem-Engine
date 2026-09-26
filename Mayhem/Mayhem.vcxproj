@@ -161,6 +161,7 @@
     <ClInclude Include="src\Engine\Core\Logger.h" />
     <ClInclude Include="src\Engine\Core\MouseCode.h" />
     <ClInclude Include="src\Engine\Core\Timestep.h" />
+    <ClInclude Include="src\Engine\Core\UUID.h" />
     <ClInclude Include="src\Engine\Core\Window.h" />
     <ClInclude Include="src\Engine\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Engine\Events\Event.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="src\Engine\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Engine\Renderer\Renderer.h" />
     <ClInclude Include="src\Engine\Renderer\Renderer2D.h" />
+    <ClInclude Include="src\Engine\Renderer\Renderer3D.h" />
     <ClInclude Include="src\Engine\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Engine\Renderer\Shader.h" />
     <ClInclude Include="src\Engine\Renderer\SubTexture2D.h" />
@@ -627,6 +629,7 @@
     <ClCompile Include="src\Engine\Core\Layer.cpp" />
     <ClCompile Include="src\Engine\Core\LayerStack.cpp" />
     <ClCompile Include="src\Engine\Core\Logger.cpp" />
+    <ClCompile Include="src\Engine\Core\UUID.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Engine\Maths\Maths.cpp" />
@@ -638,6 +641,7 @@
     <ClCompile Include="src\Engine\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Engine\Renderer\Renderer2D.cpp" />
+    <ClCompile Include="src\Engine\Renderer\Renderer3D.cpp" />
     <ClCompile Include="src\Engine\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Engine\Renderer\Shader.cpp" />
     <ClCompile Include="src\Engine\Renderer\SubTexture2D.cpp" />

@@ -1,7 +1,7 @@
 #pragma once
 //#include "Components.h"
 #include <entt.hpp>
-
+#include "Components.h"
 #include "Scene.h"
 
 namespace Mayhem
@@ -30,6 +30,11 @@ namespace Mayhem
 		std::vector<Entity*> GetChildrens()
 		{
 			return m_Childrens;
+		}
+
+		UUID GetUUID()
+		{
+			return GetComponent<IDComponent>().m_ID;
 		}
 
 		template<typename T, typename... Args>

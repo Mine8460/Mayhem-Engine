@@ -134,7 +134,7 @@ namespace Mayhem
 				if (tag)
 					name = tag["Tag"].as<std::string>();
 
-				Entity deserializedEntity = m_Scene->CreateEntity(name);
+				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(name, uuid);
 
 				auto transform = entity["TransformComponent"];
 				if (transform)
@@ -192,7 +192,7 @@ namespace Mayhem
 	{
 		_out << YAML::BeginMap; // Entity
 		_out << YAML::Key << "Entity";
-		_out << YAML::Value << "12837192831273"; // TODO: Entity ID
+		_out << YAML::Value << (uint64_t)_entity.GetComponent<IDComponent>().m_ID; // TODO: Entity ID
 
 		if (_entity.HasComponent<TagComponent>())
 		{

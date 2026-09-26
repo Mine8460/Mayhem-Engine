@@ -25,13 +25,13 @@ namespace Mayhem
 
 	struct Renderer2DData
 	{
-		const uint32_t MaxQuads = 10000;
-		const uint32_t MaxVertices = MaxQuads * 4;
-		const uint32_t MaxIndices = MaxQuads * 6;
+		const uint32_t MaxCubes = 10000;
+		const uint32_t MaxVertices = MaxCubes * 4;
+		const uint32_t MaxIndices = MaxCubes * 6;
 		static const uint32_t MaxTexturesSlots = 32; // TODO : RenderCaps
 
-		Ref<VertexArray> QuadVA;
-		Ref<VertexBuffer> QuadVB;
+		Ref<VertexArray> MeshVA;
+		Ref<VertexBuffer> MeshVB;
 		Ref<Shader> TextureShader;
 		Ref<Texture2D> WhiteTexture;
 
@@ -51,7 +51,7 @@ namespace Mayhem
 
 	void Mayhem::Renderer2D::Init()
 	{
-		s_Data.QuadVA = VertexArray::Create();
+		s_Data.MeshVA = VertexArray::Create();
 
 		float squareVertices[5 * 4] = {
 			-0.5f, -0.5f, 0.0f, -1.0f, -1.0f,
@@ -60,7 +60,7 @@ namespace Mayhem
 			-0.5f,  0.5f, 0.0f, -1.0f, 1.0f,
 		};
 
-		s_Data.QuadVB.reset(VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex)));
+		s_Data.MeshVB.reset(VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex)));
 
 		BufferLayout layout =
 		{
@@ -71,8 +71,8 @@ namespace Mayhem
 			{ ShaderDataType::Float,	"a_TilingFactor"},
 			{ ShaderDataType::Int,		"a_EntityID"},
 		};
-		s_Data.QuadVB->SetLayout(layout);
-		s_Data.QuadVA->AddVertexBuffer(s_Data.QuadVB);
+		s_Data.MeshVB->SetLayout(layout);
+		s_Data.MeshVA->AddVertexBuffer(s_Data.MeshVB);
 
 		s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices];
 
@@ -94,7 +94,7 @@ namespace Mayhem
 
 		Ref<IndexBuffer> quadIB;
 		quadIB.reset(IndexBuffer::Create(quadIndices, s_Data.MaxIndices));
-		s_Data.QuadVA->SetIndexBuffer(quadIB);
+		s_Data.MeshVA->SetIndexBuffer(quadIB);
 		delete[] quadIndices;
 
 		s_Data.WhiteTexture = Texture2D::Create(1, 1);
@@ -150,7 +150,7 @@ namespace Mayhem
 	void Renderer2D::EndScene()
 	{
 		uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;
-		s_Data.QuadVB->SetData(s_Data.QuadVertexBufferBase, dataSize);
+		s_Data.MeshVB->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
 		Flush();
 
@@ -164,7 +164,7 @@ namespace Mayhem
 
 		if (s_Data.QuadIndexCount > 0)
 		{
-			RenderCommand::DrawIndexed(s_Data.QuadVA, s_Data.QuadIndexCount);
+			RenderCommand::DrawIndexed(s_Data.MeshVA, s_Data.QuadIndexCount);
 			s_Data.Stats.DrawCalls++;
 		}
 	}

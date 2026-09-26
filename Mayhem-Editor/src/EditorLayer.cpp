@@ -161,9 +161,9 @@ namespace Mayhem
 		if (ImGui::ImageButton("Play", (ImTextureID)texture->GetRendererID(), ImVec2(size, size), { 0.f ,1.f }, { 1.f, 0.f }))
 		{
 			if (m_SceneState == SceneState::Editor)
-				m_SceneState = SceneState::Runtime;
+				OnScenePlay();
 			else if (m_SceneState == SceneState::Runtime)
-				m_SceneState = SceneState::Editor;
+				OnSceneStop();
 		}
 
 		ImGui::End();
@@ -250,16 +250,7 @@ namespace Mayhem
 
 				if (ImGui::MenuItem("Open...", "Ctrl + 0"))
 				{
-					std::string path = FileDialogs::OpenFile("Mayhem Scene (*.mayhem)\0*.mayhem\0");
-					if (!path.empty())
-					{
-						m_ActiveScene = MakeRef<Scene>();
-						m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-						m_Hierarchy.SetContext(m_ActiveScene);
-
-						SceneSerializer serializer(m_ActiveScene);
-						serializer.Deserialize(path);
-					}
+					OpenScene();
 				}
 
 				ImGui::Separator();
@@ -320,14 +311,7 @@ namespace Mayhem
 			{
 				const wchar_t* path = (const wchar_t*)payload->Data;
 
-				m_ActiveScene = MakeRef<Scene>();
-				m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-				m_Hierarchy.SetContext(m_ActiveScene);
-
-				SceneSerializer serializer(m_ActiveScene);
-				std::wstring wideString = path;
-				std::string pathString(wideString.begin(), wideString.end());
-				serializer.Deserialize(pathString);
+				OpenScene(path);
 			}
 
 			ImGui::EndDragDropTarget();
@@ -335,7 +319,7 @@ namespace Mayhem
 
 		// Gizmos
 		Entity selected = m_Hierarchy.GetSelectedEntity();
-		if (selected)
+		if (selected && m_SceneState == SceneState::Editor)
 		{
 			ImGuizmo::SetOrthographic(false);
 			ImGuizmo::SetDrawlist();
@@ -476,9 +460,42 @@ namespace Mayhem
 
 	void EditorLayer::OnScenePlay()
 	{
+		m_SceneState = SceneState::Runtime;
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
+		m_SceneState = SceneState::Editor;
+	}
+
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		if (m_SceneState == SceneState::Editor)
+			OnSceneStop();
+
+		m_ActiveScene = MakeRef<Scene>();
+		m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_Hierarchy.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		std::wstring wideString = path;
+		std::string pathString(wideString.begin(), wideString.end());
+		serializer.Deserialize(pathString);
+	}
+	void EditorLayer::OpenScene()
+	{
+		if (m_SceneState == SceneState::Editor)
+			OnSceneStop();
+
+		std::string path = FileDialogs::OpenFile("Mayhem Scene (*.mayhem)\0*.mayhem\0");
+		if (!path.empty())
+		{
+			m_ActiveScene = MakeRef<Scene>();
+			m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_Hierarchy.SetContext(m_ActiveScene);
+
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(path);
+		}
 	}
 }
