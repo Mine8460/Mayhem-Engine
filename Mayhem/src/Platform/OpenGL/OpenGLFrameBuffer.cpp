@@ -1,6 +1,6 @@
 #include "Enpch.h"
 #include "OpenGLFrameBuffer.h"
-
+#include <glad/glad.h>
 
 namespace Mayhem
 {
