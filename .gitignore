@@ -1,3 +1,8 @@
 /.vs
 /bin
 /bin-int
+*.ini
+*.log
+*.obj
+*.idb
+*.pdb
