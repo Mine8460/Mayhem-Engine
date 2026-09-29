@@ -44,11 +44,11 @@ namespace Mayhem
 
 	struct BufferElement
 	{
-		std::string Name;
-		ShaderDataType Type;
-		uint32_t Offset;
-		uint32_t Size;
-		bool Normalized;
+		std::string Name = "";
+		ShaderDataType Type = ShaderDataType::None;
+		uint32_t Offset = 0;
+		uint32_t Size = 0;
+		bool Normalized = false;
 
 		BufferElement() {}
 		BufferElement(ShaderDataType _type, const std::string& _name, bool _normalized = false)
