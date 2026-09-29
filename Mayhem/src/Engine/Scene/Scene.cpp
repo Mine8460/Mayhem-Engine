@@ -102,7 +102,7 @@ namespace Mayhem
 
 	void Scene::OnUpdateEditor(Timestep _ts, EditorCamera& _cam)
 	{
-		Renderer3D::BeginScene(_cam);
+		//Renderer3D::BeginScene(_cam);
 		Renderer2D::BeginScene(_cam);
 
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
@@ -114,7 +114,7 @@ namespace Mayhem
 			//Renderer3D::DrawCube(transform.GetTransform(), sprite.m_Color);
 		}
 
-		Renderer3D::EndScene();
+		//Renderer3D::EndScene();
 		Renderer2D::EndScene();
 	}
 

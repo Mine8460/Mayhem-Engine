@@ -12,7 +12,7 @@ namespace Mayhem
 	{
 		RenderCommand::Init();
 		Renderer2D::Init();
-		Renderer3D::Init();
+		//Renderer3D::Init();
 	}
 
 	void Renderer::Shutdown()
