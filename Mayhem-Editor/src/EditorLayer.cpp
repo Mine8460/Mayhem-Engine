@@ -50,7 +50,7 @@ namespace Mayhem
 
 	EditorLayer::EditorLayer() : Layer("Sandbox2D")
 	{
-
+		m_ContentBrowser.SetContext(this);
 	}
 
 	void EditorLayer::OnAttach()

@@ -3,7 +3,9 @@
 #include <Engine.h>
 #include <cwchar>
 #include <iostream>
-#include <fstream>>
+#include <fstream>
+
+#include "../EditorLayer.h"
 
 namespace Mayhem
 {
@@ -129,6 +131,11 @@ namespace Mayhem
 			{
 				if (it.is_directory())
 					m_CurrentDirectory /= path.filename();
+				if (extension == ".mayhem")
+				{
+					if (m_Parent)
+						m_Parent->OpenScene(path.c_str());
+				}
 			}
 			ImGui::TextWrapped(filenameString.c_str());
 			ImGui::NextColumn();
