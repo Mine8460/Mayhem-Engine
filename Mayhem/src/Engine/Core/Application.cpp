@@ -36,7 +36,7 @@ namespace Mayhem
 	{
 		while (m_Running)
 		{
-			float time = glfwGetTime(); // Platform::GetTime()
+			float time = (float)glfwGetTime(); // Platform::GetTime()
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 

@@ -50,6 +50,7 @@ namespace Mayhem
 
 	EditorLayer::EditorLayer() : Layer("Sandbox2D")
 	{
+
 	}
 
 	void EditorLayer::OnAttach()
@@ -167,7 +168,6 @@ namespace Mayhem
 		}
 
 		ImGui::End();
-
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -279,8 +279,8 @@ namespace Mayhem
 		for (ProfileResult& result : m_ProfileResults)
 		{
 			char label[75];
-			strcpy(label, "  %.3fms ");
-			strcat(label, result.Name);
+			strcpy_s(label, sizeof(label), "  %.3fms ");
+			strcat_s(label, sizeof(label), result.Name);
 			ImGui::Text(label, result.Time);
 		}
 		m_ProfileResults.clear();
@@ -303,7 +303,7 @@ namespace Mayhem
 
 		uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-		ImGui::Image((void*)textureID, ImVec2{ viewportPanelSize.x,viewportPanelSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+		ImGui::Image((ImTextureID)textureID, ImVec2{ viewportPanelSize.x,viewportPanelSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 
 		if (ImGui::BeginDragDropTarget())
 		{
@@ -440,6 +440,8 @@ namespace Mayhem
 		default:
 			break;
 		}
+
+		return false;
 	}
 
 	bool EditorLayer::OnMousePressed(MouseButtonPressedEvent& _e)
