@@ -13,39 +13,39 @@
 namespace Mayhem
 {
 
-	//template<typename Fn>
-	//class Timer
-	//{
-	//public:
-	//	Timer(const char* _name, Fn&& _func) : m_Name(_name), m_Stopped(false), m_Func(_func)
-	//	{
-	//		m_StartTimepoint = std::chrono::high_resolution_clock::now();
-	//	}
-	//	~Timer(void)
-	//	{
-	//		if (!m_Stopped)
-	//			Stop();
-	//	}
+	template<typename Fn>
+	class Timer
+	{
+	public:
+		Timer(const char* _name, Fn&& _func) : m_Name(_name), m_Stopped(false), m_Func(_func)
+		{
+			m_StartTimepoint = std::chrono::high_resolution_clock::now();
+		}
+		~Timer(void)
+		{
+			if (!m_Stopped)
+				Stop();
+		}
 
-	//	void Stop(void)
-	//	{
-	//		auto endTimepoint = std::chrono::high_resolution_clock::now();
+		void Stop(void)
+		{
+			auto endTimepoint = std::chrono::high_resolution_clock::now();
 
-	//		long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
-	//		long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
+			long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
+			long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
 
-	//		m_Stopped = true;
+			m_Stopped = true;
 
-	//		float duration = (end - start) * 0.001f;
-	//		m_Func({ m_Name, duration });
-	//	}
+			float duration = (end - start) * 0.001f;
+			m_Func({ m_Name, duration });
+		}
 
-	//private:
-	//	Fn m_Func;
-	//	const char* m_Name;
-	//	std::chrono::time_point<std::chrono::steady_clock> m_StartTimepoint;
-	//	bool m_Stopped = false;
-	//};
+	private:
+		Fn m_Func;
+		const char* m_Name;
+		std::chrono::time_point<std::chrono::steady_clock> m_StartTimepoint;
+		bool m_Stopped = false;
+	};
 
 
 	EditorLayer::EditorLayer() : Layer("Sandbox2D")
@@ -79,7 +79,7 @@ namespace Mayhem
 
 	void EditorLayer::OnUpdate(Timestep _timestep)
 	{
-		//PROFILE_FUNCTION("Editor::OnUpdate");
+		PROFILE_FUNCTION("Editor::OnUpdate");
 
 		// Resize
 		FrameBufferSpecification spec = m_FrameBuffer->GetSpecification();
@@ -100,7 +100,7 @@ namespace Mayhem
 		Renderer2D::ResetStats();
 		// Render
 		{
-			//PROFILE_FUNCTION("Editor::OnRender");
+			PROFILE_FUNCTION("Editor::OnRender");
 			m_FrameBuffer->Bind();
 			RenderCommand::Clear(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
