@@ -24,9 +24,6 @@ namespace Mayhem
 
 	struct Renderer3DData
 	{
-		const uint32_t MaxCubes = 1000;
-		const uint32_t MaxVertices = MaxCubes * 8;
-		const uint32_t MaxIndices = MaxCubes * 36;
 		static const uint32_t MaxTexturesSlots = 32; // TODO : RenderCaps
 
 		Ref<VertexArray> MeshVA;
@@ -119,11 +116,9 @@ namespace Mayhem
 		for (uint32_t i = 0; i < s_Data.MaxTexturesSlots; i++)
 			samplers[i] = i;
 
-		s_Data.Shader = Shader::Create("assets/shaders/3D.glsl");
+		s_Data.Shader = Shader::Create("assets/shaders/Texture.glsl");
 		s_Data.Shader->Bind();
 		s_Data.Shader->SetUniformIntArray("u_Texture", samplers, s_Data.MaxTexturesSlots);
-	
-		s_Data.QuadVertexBufferBase = new MeshVertex[s_Data.MaxVertices];
 	}
 
 	void Renderer3D::Shutdown()
@@ -142,7 +137,7 @@ namespace Mayhem
 	{
 	}
 
-	void Renderer3D::DrawCube(const glm::mat4& _transform, const glm::vec4& _color)
+	void Renderer3D::DrawMesh(const glm::mat4& _transform, const glm::vec4& _color)
 	{
 		s_Data.Shader->Bind();
 		s_Data.Shader->SetUniformMat4("u_Transform", _transform);
@@ -151,5 +146,4 @@ namespace Mayhem
 
 		RenderCommand::DrawIndexed(s_Data.MeshVA);
 	}
-
 }

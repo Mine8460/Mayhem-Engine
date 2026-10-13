@@ -102,20 +102,20 @@ namespace Mayhem
 
 	void Scene::OnUpdateEditor(Timestep _ts, EditorCamera& _cam)
 	{
-		//Renderer3D::BeginScene(_cam);
-		Renderer2D::BeginScene(_cam);
+		Renderer3D::BeginScene(_cam);
+		//Renderer2D::BeginScene(_cam);
 
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
 
 		for (auto entity : group)
 		{
 			auto [transform, sprite] = group.get<TransformComponent, SpriteRenderer>(entity);
-			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (uint32_t)entity);
-			//Renderer3D::DrawCube(transform.GetTransform(), sprite.m_Color);
+			//Renderer2D::DrawSprite(transform.GetTransform(), sprite, (uint32_t)entity);
+			Renderer3D::DrawMesh(transform.GetTransform(), sprite.m_Color);
 		}
 
-		//Renderer3D::EndScene();
-		Renderer2D::EndScene();
+		Renderer3D::EndScene();
+		//Renderer2D::EndScene();
 	}
 
 	void Scene::OnViewportSize(uint32_t _w, uint32_t _h)

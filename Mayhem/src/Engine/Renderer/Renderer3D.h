@@ -13,6 +13,6 @@ namespace Mayhem
 		static void BeginScene(const EditorCamera& _cam);
 		static void EndScene();
 
-		static void DrawCube(const glm::mat4& _transform, const glm::vec4& _color);
+		static void DrawMesh(const glm::mat4& _transform, const glm::vec4& _color);
 	};
 }

@@ -11,13 +11,13 @@ namespace Mayhem
 	void Renderer::Init()
 	{
 		RenderCommand::Init();
-		Renderer2D::Init();
-		//Renderer3D::Init();
+		//Renderer2D::Init();
+		Renderer3D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
-		Renderer2D::Shutdown();
+		//Renderer2D::Shutdown();
 		Renderer3D::Shutdown();
 	}
 

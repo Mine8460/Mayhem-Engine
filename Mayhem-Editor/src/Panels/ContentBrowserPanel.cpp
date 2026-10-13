@@ -71,6 +71,7 @@ namespace Mayhem
 			float x = 1.0f;
 			float y = 1.0f;
 			float z = 1.0f;
+			int show = 1;
 			if (!m_FolderColors.contains(path.string()) && it.is_directory())
 			{
 				std::ifstream file(std::string(path.string() + ".meta").c_str(), std::ios::in);
@@ -79,11 +80,13 @@ namespace Mayhem
 					file >> x;
 					file >> y;
 					file >> z;
-
+					file >> show;
 				}
 				m_FolderColors[path.string()] = glm::vec3(x, y, z);
 				file.close();
 			}
+
+			if (show == 0) continue;
 
 			if (it.is_directory())
 			{
@@ -95,7 +98,7 @@ namespace Mayhem
 			ImGui::ImageButton(path.string().c_str(), (ImTextureID)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0,1 }, { 1,0 }, ImVec4(0, 0, 0, 0), color);
 
 			std::string popupLabel = path.string() + "Folder Color";
-			// Right - click blank space
+			// Right - click on folder
 			if (it.is_directory())
 			{
 				if (ImGui::BeginPopupContextItem(popupLabel.c_str(), ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
@@ -109,6 +112,7 @@ namespace Mayhem
 						f << std::to_string(colors[0]) << std::endl;
 						f << std::to_string(colors[1]) << std::endl;
 						f << std::to_string(colors[2]) << std::endl;
+						f << std::to_string((int)1) << std::endl;
 						f.close();
 
 						m_FolderColors[path.string()] = glm::vec3(colors[0], colors[1], colors[2]);
