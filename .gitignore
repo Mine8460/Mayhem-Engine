@@ -7,3 +7,4 @@
 *.idb
 *.pdb
 *.tlog
+/Mayhem/vendor/GLAD/bin-int

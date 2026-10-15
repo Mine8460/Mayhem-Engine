@@ -102,7 +102,7 @@ namespace Mayhem
 		s_Data.MeshVA->AddVertexBuffer(s_Data.MeshVB);
 
 		Ref<IndexBuffer> quadIB;
-		quadIB.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+		quadIB.reset(IndexBuffer::Create(indices, 36));
 		s_Data.MeshVA->SetIndexBuffer(quadIB);
 
 		// Create default texture
@@ -143,6 +143,7 @@ namespace Mayhem
 		s_Data.Shader->SetUniformMat4("u_Transform", _transform);
 		s_Data.Shader->SetUniformFloat4("u_Color", _color);
 		s_Data.Shader->SetUniformFloat("u_TextureIndex", 0.f);
+		s_Data.Shader->SetUniformFloat("u_TilingFactor", 1.f);
 
 		RenderCommand::DrawIndexed(s_Data.MeshVA);
 	}

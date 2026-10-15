@@ -71,7 +71,6 @@ namespace Mayhem
 			float x = 1.0f;
 			float y = 1.0f;
 			float z = 1.0f;
-			int show = 1;
 			if (!m_FolderColors.contains(path.string()) && it.is_directory())
 			{
 				std::ifstream file(std::string(path.string() + ".meta").c_str(), std::ios::in);
@@ -80,13 +79,11 @@ namespace Mayhem
 					file >> x;
 					file >> y;
 					file >> z;
-					file >> show;
 				}
+				else continue;
 				m_FolderColors[path.string()] = glm::vec3(x, y, z);
 				file.close();
 			}
-
-			if (show == 0) continue;
 
 			if (it.is_directory())
 			{
@@ -112,7 +109,6 @@ namespace Mayhem
 						f << std::to_string(colors[0]) << std::endl;
 						f << std::to_string(colors[1]) << std::endl;
 						f << std::to_string(colors[2]) << std::endl;
-						f << std::to_string((int)1) << std::endl;
 						f.close();
 
 						m_FolderColors[path.string()] = glm::vec3(colors[0], colors[1], colors[2]);
