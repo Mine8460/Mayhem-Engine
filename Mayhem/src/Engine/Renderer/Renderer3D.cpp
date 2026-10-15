@@ -34,8 +34,9 @@ namespace Mayhem
 		std::array<Ref<Texture2D>, MaxTexturesSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1; // 0 = White Texture
 
-		MeshVertex* QuadVertexBufferBase = nullptr;
-		MeshVertex* QuadVertexBufferPtr = nullptr;
+		MeshVertex* MeshVertexBufferBase = nullptr;
+		MeshVertex* MeshVertexBufferPtr = nullptr;
+		uint32_t MaxVertices = 1000;
 	};
 
 	static Renderer3DData s_Data;
@@ -119,6 +120,9 @@ namespace Mayhem
 		s_Data.Shader = Shader::Create("assets/shaders/Texture.glsl");
 		s_Data.Shader->Bind();
 		s_Data.Shader->SetUniformIntArray("u_Texture", samplers, s_Data.MaxTexturesSlots);
+
+		s_Data.MeshVertexBufferBase = new MeshVertex[s_Data.MaxVertices];
+		s_Data.MeshVertexBufferPtr = s_Data.MeshVertexBufferBase;
 	}
 
 	void Renderer3D::Shutdown()
@@ -140,10 +144,13 @@ namespace Mayhem
 	void Renderer3D::DrawMesh(const glm::mat4& _transform, const glm::vec4& _color)
 	{
 		s_Data.Shader->Bind();
-		s_Data.Shader->SetUniformMat4("u_Transform", _transform);
-		s_Data.Shader->SetUniformFloat4("u_Color", _color);
-		s_Data.Shader->SetUniformFloat("u_TextureIndex", 0.f);
-		s_Data.Shader->SetUniformFloat("u_TilingFactor", 1.f);
+		
+		s_Data.MeshVertexBufferPtr = s_Data.MeshVertexBufferBase;
+
+		s_Data.MeshVertexBufferPtr->Position = _transform[3];
+
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.MeshVertexBufferPtr - (uint8_t*)s_Data.MeshVertexBufferBase);
+		s_Data.MeshVB->SetData(s_Data.MeshVertexBufferBase, dataSize);
 
 		RenderCommand::DrawIndexed(s_Data.MeshVA);
 	}
