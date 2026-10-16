@@ -79,23 +79,25 @@ namespace Mayhem
 
 	void EditorLayer::OnUpdate(Timestep _timestep)
 	{
-		PROFILE_FUNCTION("Editor::OnUpdate");
-
-		// Resize
-		FrameBufferSpecification spec = m_FrameBuffer->GetSpecification();
-		if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
-			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
-			m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+			PROFILE_FUNCTION("Editor::OnUpdate");
 
-			m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			// Resize
+			FrameBufferSpecification spec = m_FrameBuffer->GetSpecification();
+			if (m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
+				(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+			{
+				m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+				m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+
+				m_ActiveScene->OnViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			}
+
+
+			// Update
+
+
 		}
-
-
-		// Update
-		
-
 		// Statistics
 		Renderer2D::ResetStats();
 		// Render
@@ -311,7 +313,23 @@ namespace Mayhem
 			{
 				const wchar_t* path = (const wchar_t*)payload->Data;
 
-				OpenScene(path);
+				std::string extension = GetExtension(std::filesystem::path(path).string());
+
+				if (extension == ".mayhem")
+					OpenScene(path);
+				else if (extension == ".fbx")
+				{
+					Entity ent = m_ActiveScene->CreateEntity(std::filesystem::path(path).filename().string());
+					MeshRenderer& renderer = ent.AddComponent<MeshRenderer>();
+					renderer.m_MeshPath = std::filesystem::path(path).string();
+				}
+				else if (extension == ".png")
+				{
+					Entity ent = m_ActiveScene->CreateEntity(std::filesystem::path(path).filename().string());
+					SpriteRenderer& renderer = ent.AddComponent<SpriteRenderer>();
+					Ref<Texture2D> text = Texture2D::Create(std::filesystem::path(path).string());
+					renderer.m_Texture = text;
+				}
 			}
 
 			ImGui::EndDragDropTarget();

@@ -3,6 +3,7 @@
 #include <Engine/Renderer/Camera/SceneCamera.h>
 #include <Engine/Core/Timestep.h>
 #include <Engine/Renderer/SubTexture2D.h>
+#include <Engine/Renderer/Material.h>
 #include <Engine/Renderer/Mesh.h>
 #include <Engine/Core/UUID.h>
 #include <glm/glm.hpp>
@@ -88,7 +89,9 @@ namespace Mayhem
 
 		glm::vec4 m_Color = glm::vec4(1.0f);
 		Ref<Texture2D> m_Texture;
-		float m_Tiling = 1.0f;
+
+		std::string m_MaterialPath;
+		Ref<Material> m_Material; // nullptr = matériau par défaut
 	};
 
 	class MeshRenderer : public Component
@@ -101,8 +104,8 @@ namespace Mayhem
 
 		}
 
-		void ChangeTexture(Ref<Texture2D> _texture) { m_Texture = _texture; }
-		void RemoveTexture(void) { m_Texture.reset(); }
+		//void ChangeTexture(Ref<Texture2D> _texture) { m_Texture = _texture; }
+		//void RemoveTexture(void) { m_Texture.reset(); }
 
 		void SetMesh(const std::string& _path)
 		{
@@ -111,10 +114,11 @@ namespace Mayhem
 		}
 
 		glm::vec4 m_Color = glm::vec4(1.0f);
-		Ref<Texture2D> m_Texture;
+		std::string m_MaterialPath;
+		Ref<Material> m_Material; // nullptr = matériau par défaut
+
 		std::string m_MeshPath;
 		Ref<Mesh> m_Mesh;
-		float m_Tiling = 1.0f;
 	};
 
 	class CameraComponent : public Component

@@ -173,7 +173,9 @@ namespace Mayhem
 					std::string path = sprite["Texture"].as<std::string>();
 					if (path != "None")
 						sc.m_Texture = Texture2D::Create(path);
-					sc.m_Tiling = sprite["Tiling"].as<float>();
+					path = sprite["Material"].as<std::string>();
+					if (path != "None")
+						sc.m_Material = Material::Load(path);
 				}
 
 				auto mesh = entity["MeshRenderer"];
@@ -181,10 +183,15 @@ namespace Mayhem
 				{
 					auto& sc = deserializedEntity.AddComponent<MeshRenderer>();
 					sc.m_Color = mesh["Color"].as<glm::vec4>();
-					std::string path = mesh["Texture"].as<std::string>();
+					std::string path = mesh["Material"].as<std::string>();
 					if (path != "None")
-						sc.m_Texture = Texture2D::Create(path);
-					sc.m_Tiling = mesh["Tiling"].as<float>();
+						sc.m_Material = Material::Load(path);
+					path = mesh["Mesh"].as<std::string>();
+					if (path != "None")
+					{
+						sc.m_Mesh = Mesh::Create(path);
+						sc.m_MeshPath = sc.m_Mesh->GetPath();
+					}
 				}
 
 				auto light = entity["DirectionalLight"];
@@ -273,7 +280,10 @@ namespace Mayhem
 				_out << YAML::Key << "Texture" << YAML::Value << sprite.m_Texture->GetPath();
 			else
 				_out << YAML::Key << "Texture" << YAML::Value << "None";
-			_out << YAML::Key << "Tiling" << YAML::Value << sprite.m_Tiling;
+			if (sprite.m_Material)
+				_out << YAML::Key << "Material" << YAML::Value << sprite.m_Material->GetPath();
+			else
+				_out << YAML::Key << "Material" << YAML::Value << "None";
 
 			_out << YAML::EndMap;
 		}
@@ -285,11 +295,14 @@ namespace Mayhem
 
 			auto& mesh = _entity.GetComponent<MeshRenderer>();
 			_out << YAML::Key << "Color" << YAML::Value << mesh.m_Color;
-			if (mesh.m_Texture)
-				_out << YAML::Key << "Texture" << YAML::Value << mesh.m_Texture->GetPath();
+			if (mesh.m_Material)
+				_out << YAML::Key << "Material" << YAML::Value << mesh.m_Material->GetPath();
 			else
-				_out << YAML::Key << "Texture" << YAML::Value << "None";
-			_out << YAML::Key << "Tiling" << YAML::Value << mesh.m_Tiling;
+				_out << YAML::Key << "Material" << YAML::Value << "None";
+			if (mesh.m_Mesh)
+				_out << YAML::Key << "Mesh" << YAML::Value << mesh.m_Mesh->GetPath();
+			else
+				_out << YAML::Key << "Mesh" << YAML::Value << "None";
 
 			_out << YAML::EndMap;
 		}

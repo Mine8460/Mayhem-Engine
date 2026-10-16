@@ -153,6 +153,9 @@
     <ClInclude Include="src\Engine\Renderer\GraphicsContext.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Material.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Mesh.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
@@ -1539,6 +1542,9 @@
       <Filter>src\Engine\Renderer\Camera</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\FrameBuffer.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\Material.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Mesh.cpp">

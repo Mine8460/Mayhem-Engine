@@ -1,0 +1,12 @@
+Material:
+  Shader: assets/shaders/Standard.glsl
+  AlbedoColor: [1, 1, 1, 1]
+  AlbedoMap: assets/textures/Checkerboard.png
+  Tiling: [1, 1]
+  Offset: [0, 0]
+  AlphaCutoff: 0.0489999987
+  Lit: true
+  SpecularStrength: 0.416000009
+  Shininess: 94
+  EmissionColor: [0, 0, 0]
+  EmissionIntensity: 0

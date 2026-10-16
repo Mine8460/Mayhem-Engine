@@ -94,7 +94,7 @@ namespace Mayhem
 			auto spriteEach = spriteView.each();
 			for (auto [entity, transform, sprite] : spriteEach)
 			{
-				SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Tiling, (int)entity);
+				SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Material->m_Tiling.x, (int)entity);
 			}
 
 			auto meshView = m_Registry.view<TransformComponent, MeshRenderer>();
@@ -128,7 +128,7 @@ namespace Mayhem
 		auto spriteEach = spriteView.each();
 		for (auto [entity, transform, sprite] : spriteEach)
 		{
-			SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Tiling, (int)entity);
+			SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Material->m_Tiling.x, (int)entity);
 		}
 
 		auto meshView = m_Registry.view<TransformComponent, MeshRenderer>();

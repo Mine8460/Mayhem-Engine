@@ -575,7 +575,7 @@ namespace Mayhem
 				s_Data.QuadVertexBufferPtr->Color = _src.m_Color;
 				s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
 				s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-				s_Data.QuadVertexBufferPtr->TilingFactor = _src.m_Tiling;
+				//s_Data.QuadVertexBufferPtr->TilingFactor = _src.m_Tiling;
 				s_Data.QuadVertexBufferPtr->EntityID = (int)_entityID;
 				s_Data.QuadVertexBufferPtr++;
 			}
@@ -592,7 +592,7 @@ namespace Mayhem
 				s_Data.QuadVertexBufferPtr->Color = _src.m_Color;
 				s_Data.QuadVertexBufferPtr->TexCoord = textureCoords[i];
 				s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-				s_Data.QuadVertexBufferPtr->TilingFactor = _src.m_Tiling;
+				//s_Data.QuadVertexBufferPtr->TilingFactor = _src.m_Tiling;
 				s_Data.QuadVertexBufferPtr->EntityID = (int)_entityID;
 				s_Data.QuadVertexBufferPtr++;
 			}

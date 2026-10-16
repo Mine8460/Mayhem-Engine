@@ -4,6 +4,10 @@
 #include <imgui/imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <filesystem>
+#include <cstring>
+#include <cctype>
+
 namespace Mayhem
 {
 
@@ -149,6 +153,230 @@ namespace Mayhem
 
 		ImGui::Columns(1);
 	}
+
+	// =====================================================================
+	//  Champs d'assets (texture, mesh, material…) façon Unity
+	// =====================================================================
+
+	enum class AssetFieldResult { None, Dropped, Cleared };
+
+	// Remplace ImGui::SeparatorText (absent des versions d'ImGui antérieures à 1.89.4)
+	static void SectionTitle(const char* _text)
+	{
+		ImGui::Spacing();
+		ImGui::TextDisabled("%s", _text);
+		ImGui::Separator();
+	}
+
+	static std::string ToLower(std::string _s)
+	{
+		for (auto& c : _s) c = (char)std::tolower((unsigned char)c);
+		return _s;
+	}
+
+	// Champ en lecture seule + croix pour vider + drop filtré par extension.
+	// _outPath reçoit le chemin déposé quand le résultat vaut Dropped.
+	static AssetFieldResult DrawAssetField(const char* _label, const std::string& _displayName, bool _hasValue,
+		std::initializer_list<const char*> _extensions, std::string& _outPath, const std::string& _tooltip = "")
+	{
+		AssetFieldResult result = AssetFieldResult::None;
+		ImGui::PushID(_label);
+
+		if (_hasValue)
+		{
+			if (ImGui::Button("X"))
+				result = AssetFieldResult::Cleared;
+			ImGui::SameLine();
+		}
+
+		char buffer[256];
+		strncpy_s(buffer, sizeof(buffer), _displayName.c_str(), _TRUNCATE);
+		ImGui::InputText(_label, buffer, sizeof(buffer), ImGuiInputTextFlags_ReadOnly);
+
+		if (!_tooltip.empty() && ImGui::IsItemHovered())
+			ImGui::SetTooltip("%s", _tooltip.c_str());
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				std::filesystem::path path = (const wchar_t*)payload->Data;
+				std::string ext = ToLower(path.extension().string());
+
+				for (const char* allowed : _extensions)
+				{
+					if (ext == allowed)
+					{
+						_outPath = path.generic_string();
+						result = AssetFieldResult::Dropped;
+						break;
+					}
+				}
+			}
+			ImGui::EndDragDropTarget(); // toujours appelé, même sans drop
+		}
+
+		ImGui::PopID();
+		return result;
+	}
+
+	// Crée assets/materials/NewMaterial(N).mat
+	static Ref<Material> CreateNewMaterialAsset(bool _lit)
+	{
+		std::filesystem::path dir = "assets/materials";
+		std::filesystem::create_directories(dir);
+
+		std::filesystem::path path;
+		int index = 0;
+		do
+		{
+			path = dir / ("NewMaterial" + (index ? " " + std::to_string(index) : std::string()) + ".mat");
+			index++;
+		} while (std::filesystem::exists(path));
+
+		Ref<Material> mat = Material::CreateAsset(path.generic_string());
+		if (mat && !_lit)
+		{
+			mat->m_Lit = false;
+			mat->Save();
+		}
+		return mat;
+	}
+
+	// Slot "Material" dans un component (Sprite / Mesh Renderer)
+	static void DrawMaterialSlot(Ref<Material>& _material, std::string& _materialPath, bool _litByDefault)
+	{
+		// Chargement paresseux (scène désérialisée : seul le chemin est connu)
+		if (!_material && !_materialPath.empty())
+			_material = Material::Load(_materialPath);
+
+		std::string name = _material
+			? std::filesystem::path(_material->GetPath()).stem().string()
+			: (_litByDefault ? "Default-Material" : "Default-Unlit");
+
+		std::string dropped;
+		switch (DrawAssetField("Material", name, _material != nullptr, { ".mat" }, dropped, _material ? _material->GetPath() : ""))
+		{
+		case AssetFieldResult::Dropped:
+			if (Ref<Material> mat = Material::Load(dropped))
+			{
+				_material = mat;
+				_materialPath = dropped;
+			}
+			break;
+		case AssetFieldResult::Cleared:
+			_material.reset();
+			_materialPath.clear();
+			break;
+		default:
+			break;
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("+##NewMaterial"))
+		{
+			if (Ref<Material> mat = CreateNewMaterialAsset(_litByDefault))
+			{
+				_material = mat;
+				_materialPath = mat->GetPath();
+			}
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Creer un nouveau materiau dans assets/materials");
+	}
+
+	// Section matériau en bas de l'inspecteur (comme Unity). Sauvegarde automatique du .mat.
+	static void DrawMaterialInspector(const Ref<Material>& _material, bool _litByDefault)
+	{
+		const ImGuiTreeNodeFlags treeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+		std::string name = _material
+			? std::filesystem::path(_material->GetPath()).stem().string()
+			: (_litByDefault ? "Default-Material" : "Default-Unlit");
+
+		ImGui::Separator();
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 4));
+		bool open = ImGui::TreeNodeEx(("Material : " + name + "##MaterialInspector").c_str(), treeFlags);
+		ImGui::PopStyleVar();
+
+		if (!open)
+			return;
+
+		if (!_material)
+		{
+			ImGui::TextDisabled("Materiau par defaut (non modifiable).");
+			ImGui::TextDisabled("Cree ou glisse un .mat dans le slot Material pour l'editer.");
+			ImGui::TreePop();
+			return;
+		}
+
+		Material& mat = *_material;
+		bool save = false;
+
+		// Sauvegarde quand l'utilisateur termine une modification (relâche le slider, valide…)
+		auto saveIfEdited = [&save]() { if (ImGui::IsItemDeactivatedAfterEdit()) save = true; };
+
+		ImGui::PushID("MaterialInspector");
+
+		// ---------- Rendu ----------
+		SectionTitle("Rendu");
+		std::string dropped;
+		std::string shaderName = std::filesystem::path(mat.m_ShaderPath).filename().string();
+		switch (DrawAssetField("Shader", shaderName, !mat.m_ShaderPath.empty(), { ".glsl" }, dropped, mat.m_ShaderPath))
+		{
+		case AssetFieldResult::Dropped: mat.m_ShaderPath = dropped; save = true; break;
+		case AssetFieldResult::Cleared: mat.m_ShaderPath = Material().m_ShaderPath; save = true; break; // revient au Standard
+		default: break;
+		}
+
+		// ---------- Surface ----------
+		SectionTitle("Surface");
+		ImGui::ColorEdit4("Albedo", glm::value_ptr(mat.m_AlbedoColor));
+		saveIfEdited();
+
+		std::string albedoName = mat.m_AlbedoMapPath.empty() ? "None" : std::filesystem::path(mat.m_AlbedoMapPath).filename().string();
+		switch (DrawAssetField("Albedo Map", albedoName, !mat.m_AlbedoMapPath.empty(), { ".png", ".jpg", ".jpeg", ".tga" }, dropped, mat.m_AlbedoMapPath))
+		{
+		case AssetFieldResult::Dropped: mat.m_AlbedoMapPath = dropped; save = true; break;
+		case AssetFieldResult::Cleared: mat.m_AlbedoMapPath.clear(); save = true; break;
+		default: break;
+		}
+
+		ImGui::DragFloat2("Tiling", glm::value_ptr(mat.m_Tiling), 0.05f);
+		saveIfEdited();
+		ImGui::DragFloat2("Offset", glm::value_ptr(mat.m_Offset), 0.01f);
+		saveIfEdited();
+		ImGui::SliderFloat("Alpha Cutoff", &mat.m_AlphaCutoff, 0.0f, 1.0f);
+		saveIfEdited();
+
+		// ---------- Eclairage ----------
+		SectionTitle("Eclairage");
+		if (ImGui::Checkbox("Lit", &mat.m_Lit))
+			save = true;
+
+		// Le spéculaire n'a de sens que si le matériau est éclairé
+		if (mat.m_Lit)
+		{
+			ImGui::SliderFloat("Specular", &mat.m_SpecularStrength, 0.0f, 1.0f);
+			saveIfEdited();
+			ImGui::DragFloat("Shininess", &mat.m_Shininess, 1.0f, 1.0f, 512.0f);
+			saveIfEdited();
+		}
+
+		ImGui::ColorEdit3("Emission", glm::value_ptr(mat.m_EmissionColor));
+		saveIfEdited();
+		ImGui::DragFloat("Emission Intensity", &mat.m_EmissionIntensity, 0.05f, 0.0f, 100.0f);
+		saveIfEdited();
+
+		ImGui::PopID();
+
+		if (save)
+			mat.Save();
+
+		ImGui::TreePop();
+	}
+
+	// =====================================================================
 
 	template<typename T, typename UIFunction>
 	static void DrawComponent(const std::string& _name, Entity _entity, UIFunction _func)
@@ -335,107 +563,63 @@ namespace Mayhem
 			DrawComponent<SpriteRenderer>("Sprite Renderer", _entity, [](SpriteRenderer& _component)
 				{
 					ImGui::ColorEdit4("Color", glm::value_ptr(_component.m_Color));
-					std::string name;
-					if (_component.m_Texture)
+
+					std::string dropped;
+					std::string textureName = _component.m_Texture ? _component.m_Texture->GetPath() : "None";
+					switch (DrawAssetField("Texture", textureName, _component.m_Texture != nullptr, { ".png", ".jpg", ".jpeg", ".tga" }, dropped))
 					{
-						name = _component.m_Texture->GetPath();
-						if (ImGui::Button("X"))
-							_component.m_Texture.reset();
-						ImGui::SameLine();
+					case AssetFieldResult::Dropped: _component.m_Texture = Texture2D::Create(dropped); break;
+					case AssetFieldResult::Cleared: _component.m_Texture.reset(); break;
+					default: break;
 					}
-					else
-						name = "None";
 
-					ImGui::InputText("Texture", (char*)name.c_str(), name.size() * sizeof(char), ImGuiInputTextFlags_ReadOnly);
-
-					if (ImGui::BeginDragDropTarget())
-					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-						{
-							const wchar_t* path = (const wchar_t*)payload->Data;
-
-							std::wstring ws = path;
-							std::string pathString(ws.begin(), ws.end());
-
-							_component.m_Texture = Texture2D::Create(pathString);
-
-							ImGui::EndDragDropTarget();
-						}
-
-					};
-
-					ImGui::DragFloat("Tiling factor", &_component.m_Tiling, 0.1f, 0.1f, 1000.f);
+					DrawMaterialSlot(_component.m_Material, _component.m_MaterialPath, false);
 				});
 
 			DrawComponent<MeshRenderer>("Mesh Renderer", _entity, [](MeshRenderer& _component)
 				{
 					ImGui::ColorEdit4("Color", glm::value_ptr(_component.m_Color));
-					std::string name;
-					if (_component.m_Mesh)
+
+					std::string dropped;
+					std::string meshName = _component.m_MeshPath.empty() ? "None" : std::filesystem::path(_component.m_MeshPath).filename().string();
+					switch (DrawAssetField("Mesh", meshName, !_component.m_MeshPath.empty(), { ".fbx", ".obj", ".gltf", ".glb" }, dropped, _component.m_MeshPath))
 					{
-						name = _component.m_Mesh->GetPath();
-						if (ImGui::Button("X##Mesh"))
-							_component.m_Mesh.reset();
-						ImGui::SameLine();
+					case AssetFieldResult::Dropped:
+						_component.SetMesh(dropped); // garde aussi le chemin pour la sérialisation
+						break;
+					case AssetFieldResult::Cleared:
+						_component.m_Mesh.reset();
+						_component.m_MeshPath.clear();
+						break;
+					default:
+						break;
 					}
-					else
-						name = "None";
 
-					ImGui::InputText("Mesh", (char*)name.c_str(), name.size() * sizeof(char), ImGuiInputTextFlags_ReadOnly);
-					
-					if (ImGui::BeginDragDropTarget())
-					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-						{
-							const wchar_t* path = (const wchar_t*)payload->Data;
-
-							std::wstring ws = path;
-							std::string pathString(ws.begin(), ws.end());
-
-							_component.m_Mesh = Mesh::Create(pathString);
-
-							ImGui::EndDragDropTarget();
-						}
-
-					};
-
-					if (_component.m_Texture)
-					{
-						name = _component.m_Texture->GetPath();
-						if (ImGui::Button("X"))
-							_component.m_Texture.reset();
-						ImGui::SameLine();
-					}
-					else
-						name = "None";
-					ImGui::InputText("Texture", (char*)name.c_str(), name.size() * sizeof(char), ImGuiInputTextFlags_ReadOnly);
-
-					if (ImGui::BeginDragDropTarget())
-					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-						{
-							const wchar_t* path = (const wchar_t*)payload->Data;
-
-							std::wstring ws = path;
-							std::string pathString(ws.begin(), ws.end());
-
-							_component.m_Texture = Texture2D::Create(pathString);
-
-							ImGui::EndDragDropTarget();
-						}
-
-					};
-
-					ImGui::DragFloat("Tiling factor", &_component.m_Tiling, 0.1f, 0.1f, 1000.f);
+					DrawMaterialSlot(_component.m_Material, _component.m_MaterialPath, true);
 				});
 
 			DrawComponent<DirectionalLight>("Directional Light", _entity, [](DirectionalLight& _component)
 				{
-					ImGui::ColorEdit4("Color", glm::value_ptr(_component.m_Color));
+					ImGui::ColorEdit3("Color", glm::value_ptr(_component.m_Color));
 
-					ImGui::DragFloat("Intensity", &_component.m_Intensity, 0.1f, 0.1f, 1000.f);
-					ImGui::DragFloat("Ambiant", &_component.m_Ambient, 0.1f, 0.1f, 1000.f);
+					ImGui::DragFloat("Intensity", &_component.m_Intensity, 0.05f, 0.0f, 100.f);
+					ImGui::DragFloat("Ambient", &_component.m_Ambient, 0.01f, 0.0f, 1.f);
 				});
+
+			// ---------- Matériaux en bas de l'inspecteur, comme Unity ----------
+			if (_entity.HasComponent<MeshRenderer>())
+			{
+				ImGui::PushID("MeshMaterial");
+				DrawMaterialInspector(_entity.GetComponent<MeshRenderer>().m_Material, true);
+				ImGui::PopID();
+			}
+
+			if (_entity.HasComponent<SpriteRenderer>())
+			{
+				ImGui::PushID("SpriteMaterial");
+				DrawMaterialInspector(_entity.GetComponent<SpriteRenderer>().m_Material, false);
+				ImGui::PopID();
+			}
 		}
 	}
 

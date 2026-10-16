@@ -6,6 +6,8 @@
 #include "Panels/ContentBrowserPanel.h"
 #include <Engine/Renderer/Camera/EditorCamera.h>
 #include <imguizmo/src/ImGuizmo.h>
+#include <filesystem>
+#include <cctype>
 
 namespace Mayhem
 {
@@ -29,6 +31,14 @@ namespace Mayhem
 		virtual void OnEvent(Event& _e) override;
 		virtual bool OnKeyPressed(KeyPressedEvent& _e);
 		virtual bool OnMousePressed(MouseButtonPressedEvent& _e);
+
+		inline std::string GetExtension(const std::string& _path)
+		{
+			std::string ext = std::filesystem::path(_path).extension().string();
+			std::transform(ext.begin(), ext.end(), ext.begin(),
+				[](unsigned char c) { return (char)std::tolower(c); });
+			return ext;
+		}
 
 		void OnScenePlay();
 		void OnSceneStop();
