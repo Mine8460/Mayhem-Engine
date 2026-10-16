@@ -371,6 +371,34 @@ namespace Mayhem
 				{
 					ImGui::ColorEdit4("Color", glm::value_ptr(_component.m_Color));
 					std::string name;
+					if (_component.m_Mesh)
+					{
+						name = _component.m_Mesh->GetPath();
+						if (ImGui::Button("X##Mesh"))
+							_component.m_Mesh.reset();
+						ImGui::SameLine();
+					}
+					else
+						name = "None";
+
+					ImGui::InputText("Mesh", (char*)name.c_str(), name.size() * sizeof(char), ImGuiInputTextFlags_ReadOnly);
+					
+					if (ImGui::BeginDragDropTarget())
+					{
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+						{
+							const wchar_t* path = (const wchar_t*)payload->Data;
+
+							std::wstring ws = path;
+							std::string pathString(ws.begin(), ws.end());
+
+							_component.m_Mesh = Mesh::Create(pathString);
+
+							ImGui::EndDragDropTarget();
+						}
+
+					};
+
 					if (_component.m_Texture)
 					{
 						name = _component.m_Texture->GetPath();
@@ -380,7 +408,6 @@ namespace Mayhem
 					}
 					else
 						name = "None";
-
 					ImGui::InputText("Texture", (char*)name.c_str(), name.size() * sizeof(char), ImGuiInputTextFlags_ReadOnly);
 
 					if (ImGui::BeginDragDropTarget())

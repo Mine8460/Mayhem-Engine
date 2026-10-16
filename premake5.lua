@@ -20,6 +20,14 @@ IncludeDir["stb"] = "Mayhem/vendor/stb_image"
 IncludeDir["entt"] = "Mayhem/vendor/entt"
 IncludeDir["yaml"] = "Mayhem/vendor/yaml/include"
 IncludeDir["ImGuizmo"] = "Mayhem/vendor/imguizmo/src"
+IncludeDir["assimp"] = "Mayhem/vendor/assimp/include"
+IncludeDir["assimp_config"] = "Mayhem/vendor/assimp/build/include"
+
+LibraryDir = LibraryDir or {}
+LibraryDir["assimp_Debug"] = "Mayhem/vendor/assimp/build/lib/Debug"
+LibraryDir["assimp_Release"] = "Mayhem/vendor/assimp/build/lib/Release"
+LibraryDir["assimp_bin_Debug"] = "Mayhem/vendor/assimp/build/bin/Debug"
+LibraryDir["assimp_bin_Release"] = "Mayhem/vendor/assimp/build/bin/Release"
 
 include "Mayhem/vendor/GLFW"
 include "Mayhem/vendor/GLAD"
@@ -38,6 +46,8 @@ project "Mayhem"
 
 	pchheader "Enpch.h"
 	pchsource "Mayhem/src/Enpch.cpp"
+
+	removefiles { "Mayhem/vendor/assimp/**" }
 
 	files
 	{
@@ -63,6 +73,8 @@ project "Mayhem"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml}",
 		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.assimp}",
+		"%{IncludeDir.assimp_config}",
 	}
 
 	links
@@ -89,16 +101,22 @@ project "Mayhem"
 		}
 
 	filter "configurations:Debug"
+		libdirs { "%{LibraryDir.assimp_Debug}" }
+		links { "assimp-vc145-mtd.lib" }
 		defines "ENGINE_DEBUG"
 		runtime "Debug"
 		symbols "on"
 
 	filter "configurations:Release"
+		libdirs { "%{LibraryDir.assimp_Release}" }
+		links { "assimp-vc145-mt.lib" }
 		defines "ENGINE_RELEASE"
 		runtime "Release"
 		optimize "on"
 
 	filter "configurations:Dist"
+		libdirs { "%{LibraryDir.assimp_Release}" }
+		links { "assimp-vc145-mt.lib" }
 		defines "ENGINE_DIST"
 		runtime "Release"
 		optimize "on"

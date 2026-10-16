@@ -247,6 +247,18 @@ namespace Mayhem
 		DrawMesh(s_Data.CubeMesh, _transform, _texture, _color, _tiling, _entityID);
 	}
 
+	void SceneRenderer::DrawMeshRenderer(const glm::mat4& _transform, MeshRenderer& _src, int _entityID)
+	{
+		// Chargement paresseux (ex : après désérialisation où seul le chemin est connu)
+		if (!_src.m_Mesh && !_src.m_MeshPath.empty())
+			_src.m_Mesh = Mesh::Create(_src.m_MeshPath);
+
+		if (!_src.m_Mesh)
+			return;
+
+		DrawMesh(_src.m_Mesh, _transform, _src.m_Texture, _src.m_Color, _src.m_Tiling, _entityID);
+	}
+
 	// ---------- Stats ----------
 
 	SceneRenderer::Statistics SceneRenderer::GetStats()

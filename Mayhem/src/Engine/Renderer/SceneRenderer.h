@@ -54,6 +54,8 @@ namespace Mayhem
 		static void DrawCube(const glm::mat4& _transform, const glm::vec4& _color, int _entityID = -1);
 		static void DrawCube(const glm::mat4& _transform, const Ref<Texture2D>& _texture, const glm::vec4& _color = glm::vec4(1.0f), float _tiling = 1.0f, int _entityID = -1);
 
+		static void DrawMeshRenderer(const glm::mat4& _transform, MeshRenderer& _src, int _entityID);
+
 		struct Statistics
 		{
 			uint32_t DrawCalls = 0;

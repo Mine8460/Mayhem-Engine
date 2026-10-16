@@ -3,6 +3,7 @@
 #include <Engine/Renderer/Camera/SceneCamera.h>
 #include <Engine/Core/Timestep.h>
 #include <Engine/Renderer/SubTexture2D.h>
+#include <Engine/Renderer/Mesh.h>
 #include <Engine/Core/UUID.h>
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -103,8 +104,16 @@ namespace Mayhem
 		void ChangeTexture(Ref<Texture2D> _texture) { m_Texture = _texture; }
 		void RemoveTexture(void) { m_Texture.reset(); }
 
+		void SetMesh(const std::string& _path)
+		{
+			m_MeshPath = _path;
+			m_Mesh = Mesh::Create(_path);
+		}
+
 		glm::vec4 m_Color = glm::vec4(1.0f);
 		Ref<Texture2D> m_Texture;
+		std::string m_MeshPath;
+		Ref<Mesh> m_Mesh;
 		float m_Tiling = 1.0f;
 	};
 

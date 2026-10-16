@@ -27,14 +27,10 @@ namespace Mayhem
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& _VA, uint32_t _iCount)
 	{
-		if (_iCount == 0)
-		{
-			glDrawElements(GL_TRIANGLES, _VA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-		}
-		else
-		{
-			glDrawElements(GL_TRIANGLES, _iCount, GL_UNSIGNED_INT, nullptr);
-		}
+		_VA->Bind();
+
+		uint32_t count = _iCount ? _iCount : _VA->GetIndexBuffer()->GetCount();
+		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
 
 }

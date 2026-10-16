@@ -57,7 +57,7 @@ namespace Mayhem
 
 		}
 
-		// Render sprites
+
 		Camera* mainCamera = nullptr;
 		glm::mat4 cameraTransform;
 		{
@@ -90,20 +90,18 @@ namespace Mayhem
 			RenderCommand::Clear(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 			SceneRenderer::BeginScene(*mainCamera, cameraTransform);
 
-			auto spriteGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
-
-			for (auto entity : spriteGroup)
+			auto spriteView = m_Registry.view<TransformComponent, SpriteRenderer>();
+			auto spriteEach = spriteView.each();
+			for (auto [entity, transform, sprite] : spriteEach)
 			{
-				auto [transform, sprite] = spriteGroup.get<TransformComponent, SpriteRenderer>(entity);
-				SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Tiling, (uint32_t)entity);
+				SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Tiling, (int)entity);
 			}
 
-			auto meshGroup = m_Registry.group<TransformComponent>(entt::get<MeshRenderer>);
-
-			for (auto entity : meshGroup)
+			auto meshView = m_Registry.view<TransformComponent, MeshRenderer>();
+			auto meshEach = meshView.each();
+			for (auto [entity, transform, mesh] : meshEach)
 			{
-				auto [transform, mesh] = meshGroup.get<TransformComponent, MeshRenderer>(entity);
-				SceneRenderer::DrawCube(transform.GetTransform(), mesh.m_Texture, mesh.m_Color, mesh.m_Tiling, (uint32_t)entity);
+				SceneRenderer::DrawMeshRenderer(transform.GetTransform(), mesh, (int)entity);
 			}
 
 			SceneRenderer::EndScene();
@@ -126,20 +124,19 @@ namespace Mayhem
 			break; // une seule lumière directionnelle pour l'instant
 		}
 
-		//auto spriteGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
-		auto meshGroup = m_Registry.group<TransformComponent>(entt::get<MeshRenderer>);
-
-		for (auto entity : meshGroup)
+		auto spriteView = m_Registry.view<TransformComponent, SpriteRenderer>();
+		auto spriteEach = spriteView.each();
+		for (auto [entity, transform, sprite] : spriteEach)
 		{
-			auto [transform, mesh] = meshGroup.get<TransformComponent, MeshRenderer>(entity);
-			SceneRenderer::DrawCube(transform.GetTransform(), mesh.m_Texture, mesh.m_Color, mesh.m_Tiling, (uint32_t)entity);
+			SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Tiling, (int)entity);
 		}
 
-		//for (auto entity : spriteGroup)
-		//{
-		//	auto [transform, sprite] = spriteGroup.get<TransformComponent, SpriteRenderer>(entity);
-		//	SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Tiling, (uint32_t)entity);
-		//}
+		auto meshView = m_Registry.view<TransformComponent, MeshRenderer>();
+		auto meshEach = meshView.each();
+		for (auto [entity, transform, mesh] : meshEach)
+		{
+			SceneRenderer::DrawMeshRenderer(transform.GetTransform(), mesh, (int)entity);
+		}
 
 		SceneRenderer::EndScene();
 	}
