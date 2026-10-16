@@ -1,157 +1,218 @@
 #include "Enpch.h"
 #include "Renderer3D.h"
 
-#include "Shader.h"
-#include "Texture.h"
-#include <array>
-#include "Buffer.h"
 #include "VertexArray.h"
+#include "Shader.h"
 #include "RenderCommand.h"
+#include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 
 namespace Mayhem
 {
-	struct MeshVertex
+	struct CubeVertex
 	{
 		glm::vec3 Position;
-		glm::vec4 Color;
+		glm::vec3 Normal;
 		glm::vec2 TexCoord;
-		float TexIndex;
-		float TilingFactor;
-
-		//// Editor-only
-		//int EntityID = 0;
 	};
 
 	struct Renderer3DData
 	{
-		static const uint32_t MaxTexturesSlots = 32; // TODO : RenderCaps
+		static const uint32_t CubeVertexCount = 24; // 4 sommets par face (normales/UV propres à chaque face)
+		static const uint32_t CubeIndexCount = 36;  // 6 faces * 2 triangles * 3
 
-		Ref<VertexArray> MeshVA;
-		Ref<VertexBuffer> MeshVB;
-		Ref<Shader> Shader;
+		Ref<VertexArray> CubeVA;
+		Ref<VertexBuffer> CubeVB;
+		Ref<Shader> CubeShader;
 		Ref<Texture2D> WhiteTexture;
 
-		std::array<Ref<Texture2D>, MaxTexturesSlots> TextureSlots;
-		uint32_t TextureSlotIndex = 1; // 0 = White Texture
-
-		MeshVertex* MeshVertexBufferBase = nullptr;
-		MeshVertex* MeshVertexBufferPtr = nullptr;
-		uint32_t MaxVertices = 1000;
+		Renderer3D::Statistics Stats;
 	};
 
 	static Renderer3DData s_Data;
 
 	void Renderer3D::Init()
 	{
-		// Create vertex array
-		s_Data.MeshVA = VertexArray::Create();
+		s_Data.CubeVA = VertexArray::Create();
 
-		// Create Cube
-		glm::vec3 vertices[] =
-		{
-			{ -0.5f, -0.5f, -0.5f },
-			{  0.5f, -0.5f, -0.5f },
-			{  0.5f,  0.5f, -0.5f },
-			{ -0.5f,  0.5f, -0.5f },
-
-			{ -0.5f, -0.5f,  0.5f },
-			{  0.5f, -0.5f,  0.5f },
-			{  0.5f,  0.5f,  0.5f },
-			{ -0.5f,  0.5f,  0.5f }
+		// Cube unitaire centré sur l'origine, faces en sens anti-horaire vues de l'extérieur
+		CubeVertex cubeVertices[Renderer3DData::CubeVertexCount] = {
+			// Avant (+Z)
+			{ { -0.5f, -0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 0.0f, 0.0f } },
+			{ {  0.5f, -0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 1.0f, 0.0f } },
+			{ {  0.5f,  0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 1.0f, 1.0f } },
+			{ { -0.5f,  0.5f,  0.5f }, {  0.0f,  0.0f,  1.0f }, { 0.0f, 1.0f } },
+			// Arrière (-Z)
+			{ {  0.5f, -0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 0.0f, 0.0f } },
+			{ { -0.5f, -0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 1.0f, 0.0f } },
+			{ { -0.5f,  0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 1.0f, 1.0f } },
+			{ {  0.5f,  0.5f, -0.5f }, {  0.0f,  0.0f, -1.0f }, { 0.0f, 1.0f } },
+			// Gauche (-X)
+			{ { -0.5f, -0.5f, -0.5f }, { -1.0f,  0.0f,  0.0f }, { 0.0f, 0.0f } },
+			{ { -0.5f, -0.5f,  0.5f }, { -1.0f,  0.0f,  0.0f }, { 1.0f, 0.0f } },
+			{ { -0.5f,  0.5f,  0.5f }, { -1.0f,  0.0f,  0.0f }, { 1.0f, 1.0f } },
+			{ { -0.5f,  0.5f, -0.5f }, { -1.0f,  0.0f,  0.0f }, { 0.0f, 1.0f } },
+			// Droite (+X)
+			{ {  0.5f, -0.5f,  0.5f }, {  1.0f,  0.0f,  0.0f }, { 0.0f, 0.0f } },
+			{ {  0.5f, -0.5f, -0.5f }, {  1.0f,  0.0f,  0.0f }, { 1.0f, 0.0f } },
+			{ {  0.5f,  0.5f, -0.5f }, {  1.0f,  0.0f,  0.0f }, { 1.0f, 1.0f } },
+			{ {  0.5f,  0.5f,  0.5f }, {  1.0f,  0.0f,  0.0f }, { 0.0f, 1.0f } },
+			// Haut (+Y)
+			{ { -0.5f,  0.5f,  0.5f }, {  0.0f,  1.0f,  0.0f }, { 0.0f, 0.0f } },
+			{ {  0.5f,  0.5f,  0.5f }, {  0.0f,  1.0f,  0.0f }, { 1.0f, 0.0f } },
+			{ {  0.5f,  0.5f, -0.5f }, {  0.0f,  1.0f,  0.0f }, { 1.0f, 1.0f } },
+			{ { -0.5f,  0.5f, -0.5f }, {  0.0f,  1.0f,  0.0f }, { 0.0f, 1.0f } },
+			// Bas (-Y)
+			{ { -0.5f, -0.5f, -0.5f }, {  0.0f, -1.0f,  0.0f }, { 0.0f, 0.0f } },
+			{ {  0.5f, -0.5f, -0.5f }, {  0.0f, -1.0f,  0.0f }, { 1.0f, 0.0f } },
+			{ {  0.5f, -0.5f,  0.5f }, {  0.0f, -1.0f,  0.0f }, { 1.0f, 1.0f } },
+			{ { -0.5f, -0.5f,  0.5f }, {  0.0f, -1.0f,  0.0f }, { 0.0f, 1.0f } },
 		};
 
-		uint32_t indices[] =
-		{
-			// Back
-			0, 1, 2,
-			2, 3, 0,
+		s_Data.CubeVB.reset(VertexBuffer::Create((float*)cubeVertices, sizeof(cubeVertices)));
 
-			// Front
-			4, 5, 6,
-			6, 7, 4,
-
-			// Left
-			0, 4, 7,
-			7, 3, 0,
-
-			// Right
-			1, 5, 6,
-			6, 2, 1,
-
-			// Bottom
-			0, 1, 5,
-			5, 4, 0,
-
-			// Top
-			3, 2, 6,
-			6, 7, 3
-		};
-
-		s_Data.MeshVB.reset(VertexBuffer::Create(sizeof(vertices)));
-		s_Data.MeshVB->SetData(vertices, sizeof(vertices));
 		BufferLayout layout =
 		{
 			{ ShaderDataType::Float3,	"a_Position"},
-			{ ShaderDataType::Float4,	"a_Color"},
+			{ ShaderDataType::Float3,	"a_Normal"},
 			{ ShaderDataType::Float2,	"a_TexCoord"},
-			{ ShaderDataType::Float,	"a_TexIndex"},
-			{ ShaderDataType::Float,	"a_TilingFactor"},
-			//{ ShaderDataType::Int,		"a_EntityID"},
 		};
+		s_Data.CubeVB->SetLayout(layout);
+		s_Data.CubeVA->AddVertexBuffer(s_Data.CubeVB);
 
-		s_Data.MeshVB->SetLayout(layout);
-		s_Data.MeshVA->AddVertexBuffer(s_Data.MeshVB);
+		uint32_t cubeIndices[Renderer3DData::CubeIndexCount];
+		uint32_t offset = 0;
+		for (uint32_t i = 0; i < Renderer3DData::CubeIndexCount; i += 6)
+		{
+			cubeIndices[i + 0] = offset + 0;
+			cubeIndices[i + 1] = offset + 1;
+			cubeIndices[i + 2] = offset + 2;
 
-		Ref<IndexBuffer> quadIB;
-		quadIB.reset(IndexBuffer::Create(indices, 36));
-		s_Data.MeshVA->SetIndexBuffer(quadIB);
+			cubeIndices[i + 3] = offset + 2;
+			cubeIndices[i + 4] = offset + 3;
+			cubeIndices[i + 5] = offset + 0;
 
-		// Create default texture
+			offset += 4;
+		}
+
+		Ref<IndexBuffer> cubeIB;
+		cubeIB.reset(IndexBuffer::Create(cubeIndices, Renderer3DData::CubeIndexCount));
+		s_Data.CubeVA->SetIndexBuffer(cubeIB);
+
 		s_Data.WhiteTexture = Texture2D::Create(1, 1);
 		uint32_t whiteTextureData = 0xffffffff;
 		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
-		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
-		// Create shader
-		int samplers[s_Data.MaxTexturesSlots];
-		for (uint32_t i = 0; i < s_Data.MaxTexturesSlots; i++)
-			samplers[i] = i;
-
-		s_Data.Shader = Shader::Create("assets/shaders/Texture.glsl");
-		s_Data.Shader->Bind();
-		s_Data.Shader->SetUniformIntArray("u_Texture", samplers, s_Data.MaxTexturesSlots);
-
-		s_Data.MeshVertexBufferBase = new MeshVertex[s_Data.MaxVertices];
-		s_Data.MeshVertexBufferPtr = s_Data.MeshVertexBufferBase;
+		s_Data.CubeShader = Shader::Create("assets/shaders/Cube.glsl");
+		s_Data.CubeShader->Bind();
+		s_Data.CubeShader->SetUniformInt("u_Texture", 0);
 	}
 
 	void Renderer3D::Shutdown()
 	{
 	}
 
+	void Renderer3D::SetViewProjection(const glm::mat4& _viewProj)
+	{
+		s_Data.CubeShader->Bind();
+		s_Data.CubeShader->SetUniformMat4("u_ViewProjection", _viewProj);
+	}
+
+	void Renderer3D::BeginScene(const OrthographicCamera& _cam)
+	{
+		SetViewProjection(_cam.GetViewProjectionMatrix());
+	}
+
 	void Renderer3D::BeginScene(const EditorCamera& _cam)
 	{
-		s_Data.Shader->Bind();
-		s_Data.Shader->SetUniformMat4("u_ViewProjection", _cam.GetViewProjection());
+		SetViewProjection(_cam.GetViewProjection());
+	}
 
-		//ResetBatchCount();
+	void Renderer3D::BeginScene(const Camera& _cam, const glm::mat4& _transform)
+	{
+		SetViewProjection(_cam.GetProjection() * glm::inverse(_transform));
 	}
 
 	void Renderer3D::EndScene()
 	{
+		// Plus de batch : chaque cube est dessiné immédiatement dans DrawCube
 	}
 
-	void Renderer3D::DrawMesh(const glm::mat4& _transform, const glm::vec4& _color)
+	void Renderer3D::Submit(const glm::mat4& _transform, const Ref<Texture2D>& _texture, const glm::vec4& _color, float _tiling, int _entityID)
 	{
-		s_Data.Shader->Bind();
-		
-		s_Data.MeshVertexBufferPtr = s_Data.MeshVertexBufferBase;
+		s_Data.CubeShader->Bind();
+		s_Data.CubeShader->SetUniformMat4("u_Transform", _transform);
+		s_Data.CubeShader->SetUniformFloat4("u_Color", _color);
+		s_Data.CubeShader->SetUniformFloat("u_TilingFactor", _tiling);
+		s_Data.CubeShader->SetUniformInt("u_EntityID", _entityID);
 
-		s_Data.MeshVertexBufferPtr->Position = _transform[3];
+		_texture->Bind(0);
 
-		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.MeshVertexBufferPtr - (uint8_t*)s_Data.MeshVertexBufferBase);
-		s_Data.MeshVB->SetData(s_Data.MeshVertexBufferBase, dataSize);
+		RenderCommand::DrawIndexed(s_Data.CubeVA, Renderer3DData::CubeIndexCount);
 
-		RenderCommand::DrawIndexed(s_Data.MeshVA);
+		s_Data.Stats.DrawCalls++;
+		s_Data.Stats.CubeCount++;
+	}
+
+	// ---------- Couleur unie ----------
+
+	void Renderer3D::DrawCube(const glm::vec3& _pos, const glm::vec3& _size, const glm::vec4& _color)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), _pos)
+			* glm::scale(glm::mat4(1.0f), _size);
+
+		DrawCube(transform, _color);
+	}
+
+	void Renderer3D::DrawCube(const glm::vec3& _pos, const glm::vec3& _rotation, const glm::vec3& _size, const glm::vec4& _color)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), _pos)
+			* glm::toMat4(glm::quat(_rotation)) // rotation en radians (x, y, z)
+			* glm::scale(glm::mat4(1.0f), _size);
+
+		DrawCube(transform, _color);
+	}
+
+	void Renderer3D::DrawCube(const glm::mat4& _transform, const glm::vec4& _color, int _entityID)
+	{
+		Submit(_transform, s_Data.WhiteTexture, _color, 1.0f, _entityID);
+	}
+
+	// ---------- Texturé ----------
+
+	void Renderer3D::DrawCube(const glm::vec3& _pos, const glm::vec3& _size, const Ref<Texture2D>& _texture, const glm::vec4& _color, float _tiling)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), _pos)
+			* glm::scale(glm::mat4(1.0f), _size);
+
+		DrawCube(transform, _texture, _color, _tiling);
+	}
+
+	void Renderer3D::DrawCube(const glm::vec3& _pos, const glm::vec3& _rotation, const glm::vec3& _size, const Ref<Texture2D>& _texture, const glm::vec4& _color, float _tiling)
+	{
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), _pos)
+			* glm::toMat4(glm::quat(_rotation))
+			* glm::scale(glm::mat4(1.0f), _size);
+
+		DrawCube(transform, _texture, _color, _tiling);
+	}
+
+	void Renderer3D::DrawCube(const glm::mat4& _transform, const Ref<Texture2D>& _texture, const glm::vec4& _color, float _tiling, int _entityID)
+	{
+		Submit(_transform, _texture ? _texture : s_Data.WhiteTexture, _color, _tiling, _entityID);
+	}
+
+	// ---------- Stats ----------
+
+	Renderer3D::Statistics Renderer3D::GetStats()
+	{
+		return s_Data.Stats;
+	}
+
+	void Renderer3D::ResetStats()
+	{
+		s_Data.Stats.DrawCalls = 0;
+		s_Data.Stats.CubeCount = 0;
 	}
 }

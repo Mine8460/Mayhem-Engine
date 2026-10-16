@@ -175,6 +175,25 @@ namespace Mayhem
 						sc.m_Texture = Texture2D::Create(path);
 					sc.m_Tiling = sprite["Tiling"].as<float>();
 				}
+
+				auto mesh = entity["MeshRenderer"];
+				if (mesh)
+				{
+					auto& sc = deserializedEntity.AddComponent<MeshRenderer>();
+					sc.m_Color = mesh["Color"].as<glm::vec4>();
+					std::string path = mesh["Texture"].as<std::string>();
+					if (path != "None")
+						sc.m_Texture = Texture2D::Create(path);
+					sc.m_Tiling = mesh["Tiling"].as<float>();
+				}
+
+				auto light = entity["DirectionalLight"];
+				if (light)
+				{
+					auto& sc = deserializedEntity.AddComponent<DirectionalLight>();
+					sc.m_Intensity = light["Intensity"].as<float>();
+					sc.m_Ambient = light["Ambiant"].as<float>();
+				}
 			}
 		}
 
@@ -259,6 +278,33 @@ namespace Mayhem
 			_out << YAML::EndMap;
 		}
 
+		if (_entity.HasComponent<MeshRenderer>())
+		{
+			_out << YAML::Key << "MeshRenderer";
+			_out << YAML::BeginMap;
+
+			auto& mesh = _entity.GetComponent<MeshRenderer>();
+			_out << YAML::Key << "Color" << YAML::Value << mesh.m_Color;
+			if (mesh.m_Texture)
+				_out << YAML::Key << "Texture" << YAML::Value << mesh.m_Texture->GetPath();
+			else
+				_out << YAML::Key << "Texture" << YAML::Value << "None";
+			_out << YAML::Key << "Tiling" << YAML::Value << mesh.m_Tiling;
+
+			_out << YAML::EndMap;
+		}
+
+		if (_entity.HasComponent<DirectionalLight>())
+		{
+			_out << YAML::Key << "DirectionalLight";
+			_out << YAML::BeginMap;
+
+			auto& light = _entity.GetComponent<DirectionalLight>();
+			_out << YAML::Key << "Intensity" << YAML::Value << light.m_Intensity;
+			_out << YAML::Key << "Ambiant" << YAML::Value << light.m_Ambient;
+
+			_out << YAML::EndMap;
+		}
 		_out << YAML::EndMap; // Entity
 	}
 

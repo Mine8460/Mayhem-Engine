@@ -1485,6 +1485,8 @@
     <ClInclude Include="src\Engine\Core\AssetsManager.h" />
     <ClInclude Include="src\Engine\Core\UUID.h" />
     <ClInclude Include="src\Engine\Renderer\Renderer3D.h" />
+    <ClInclude Include="src\Engine\Renderer\Mesh.h" />
+    <ClInclude Include="src\Engine\Renderer\SceneRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1601,5 +1603,7 @@
     <ClCompile Include="src\Engine\Core\AssetsManager.cpp" />
     <ClCompile Include="src\Engine\Core\UUID.cpp" />
     <ClCompile Include="src\Engine\Renderer\Renderer3D.cpp" />
+    <ClCompile Include="src\Engine\Renderer\Mesh.cpp" />
+    <ClCompile Include="src\Engine\Renderer\SceneRenderer.cpp" />
   </ItemGroup>
 </Project>

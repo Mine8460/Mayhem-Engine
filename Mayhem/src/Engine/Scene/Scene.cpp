@@ -2,8 +2,7 @@
 #include "Scene.h"
 #include "Components.h"
 #include "Entity.h"
-#include <Engine/Renderer/Renderer2D.h>
-#include <Engine/Renderer/Renderer3D.h>
+#include <Engine/Renderer/SceneRenderer.h>
 #include <Engine/Renderer/RenderCommand.h>
 #include <Engine/Scene/ScriptableEntity.h>
 
@@ -77,22 +76,37 @@ namespace Mayhem
 			}
 		}
 
+		auto lights = m_Registry.view<TransformComponent, DirectionalLight>();
+		auto viewEach = lights.each();
+		for (auto [entity, transform, light] : viewEach)
+		{
+			SceneRenderer::SetDirectionalLight(transform.GetTransform(), light.m_Color, light.m_Intensity, light.m_Ambient);
+			break; // une seule lumière directionnelle pour l'instant
+		}
+
 		// Render 2D
 		if (mainCamera != nullptr)
 		{
 			RenderCommand::Clear(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-			Renderer2D::BeginScene(mainCamera->GetProjection(), cameraTransform);
+			SceneRenderer::BeginScene(*mainCamera, cameraTransform);
 
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
+			auto spriteGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
 
-			for (auto entity : group)
+			for (auto entity : spriteGroup)
 			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRenderer>(entity);
-
-				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (uint32_t)entity);
+				auto [transform, sprite] = spriteGroup.get<TransformComponent, SpriteRenderer>(entity);
+				SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Tiling, (uint32_t)entity);
 			}
 
-			Renderer2D::EndScene();
+			auto meshGroup = m_Registry.group<TransformComponent>(entt::get<MeshRenderer>);
+
+			for (auto entity : meshGroup)
+			{
+				auto [transform, mesh] = meshGroup.get<TransformComponent, MeshRenderer>(entity);
+				SceneRenderer::DrawCube(transform.GetTransform(), mesh.m_Texture, mesh.m_Color, mesh.m_Tiling, (uint32_t)entity);
+			}
+
+			SceneRenderer::EndScene();
 		}
 		else
 		{
@@ -102,20 +116,32 @@ namespace Mayhem
 
 	void Scene::OnUpdateEditor(Timestep _ts, EditorCamera& _cam)
 	{
-		Renderer3D::BeginScene(_cam);
-		//Renderer2D::BeginScene(_cam);
+		SceneRenderer::BeginScene(_cam);
 
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
-
-		for (auto entity : group)
+		auto lights = m_Registry.view<TransformComponent, DirectionalLight>();
+		auto viewEach = lights.each();
+		for (auto [entity, transform, light] : viewEach)
 		{
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRenderer>(entity);
-			//Renderer2D::DrawSprite(transform.GetTransform(), sprite, (uint32_t)entity);
-			Renderer3D::DrawMesh(transform.GetTransform(), sprite.m_Color);
+			SceneRenderer::SetDirectionalLight(transform.GetTransform(), light.m_Color, light.m_Intensity, light.m_Ambient);
+			break; // une seule lumière directionnelle pour l'instant
 		}
 
-		Renderer3D::EndScene();
-		//Renderer2D::EndScene();
+		//auto spriteGroup = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
+		auto meshGroup = m_Registry.group<TransformComponent>(entt::get<MeshRenderer>);
+
+		for (auto entity : meshGroup)
+		{
+			auto [transform, mesh] = meshGroup.get<TransformComponent, MeshRenderer>(entity);
+			SceneRenderer::DrawCube(transform.GetTransform(), mesh.m_Texture, mesh.m_Color, mesh.m_Tiling, (uint32_t)entity);
+		}
+
+		//for (auto entity : spriteGroup)
+		//{
+		//	auto [transform, sprite] = spriteGroup.get<TransformComponent, SpriteRenderer>(entity);
+		//	SceneRenderer::DrawQuad(transform.GetTransform(), sprite.m_Texture, sprite.m_Color, sprite.m_Tiling, (uint32_t)entity);
+		//}
+
+		SceneRenderer::EndScene();
 	}
 
 	void Scene::OnViewportSize(uint32_t _w, uint32_t _h)

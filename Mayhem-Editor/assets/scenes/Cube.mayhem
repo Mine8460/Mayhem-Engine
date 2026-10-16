@@ -1,0 +1,23 @@
+Scene: Name
+Entities:
+  - Entity: 11112739873652533101
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Translation: [1, 1, 1]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRenderer:
+      Color: [1, 1, 1, 1]
+      Texture: None
+      Tiling: 1
+  - Entity: 6762572377698215439
+    TagComponent:
+      Tag: Light
+    TransformComponent:
+      Translation: [-1.20000005, 0, 2.29999995]
+      Rotation: [-0.618139744, -0.735663414, 4.42179498e-07]
+      Scale: [0.999999881, 1, 0.999999523]
+    DirectionalLight:
+      Intensity: 1
+      Ambiant: 0.200000003

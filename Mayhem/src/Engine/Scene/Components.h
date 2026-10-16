@@ -90,6 +90,24 @@ namespace Mayhem
 		float m_Tiling = 1.0f;
 	};
 
+	class MeshRenderer : public Component
+	{
+	public:
+		MeshRenderer() = default;
+		MeshRenderer(const MeshRenderer&) = default;
+		MeshRenderer(glm::vec4 _color) : m_Color(_color)
+		{
+
+		}
+
+		void ChangeTexture(Ref<Texture2D> _texture) { m_Texture = _texture; }
+		void RemoveTexture(void) { m_Texture.reset(); }
+
+		glm::vec4 m_Color = glm::vec4(1.0f);
+		Ref<Texture2D> m_Texture;
+		float m_Tiling = 1.0f;
+	};
+
 	class CameraComponent : public Component
 	{
 	public:
@@ -99,6 +117,17 @@ namespace Mayhem
 		SceneCamera m_Camera;
 		bool m_Primary = true;
 		bool m_FixedAspectRatio = false;
+	};
+
+	class DirectionalLight : public Component
+	{
+	public:
+		DirectionalLight() {}
+		DirectionalLight(const DirectionalLight&) = default;
+
+		glm::vec3 m_Color = { 1.0f, 1.0f, 1.0f };
+		float m_Intensity = 1.0f;
+		float m_Ambient = 0.2f;
 	};
 
 	class ScriptableEntity;

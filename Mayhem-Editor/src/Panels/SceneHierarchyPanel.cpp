@@ -192,7 +192,6 @@ namespace Mayhem
 		}
 	}
 
-
 	void SceneHierarchyPanel::DrawComponents(Entity _entity)
 	{
 		if (_entity)
@@ -236,6 +235,22 @@ namespace Mayhem
 						if (ImGui::MenuItem("Sprite"))
 						{
 							m_selectionContext.AddComponent<SpriteRenderer>();
+							ImGui::CloseCurrentPopup();
+						}
+					}
+					if (!_entity.HasComponent<MeshRenderer>())
+					{
+						if (ImGui::MenuItem("Mesh"))
+						{
+							m_selectionContext.AddComponent<MeshRenderer>();
+							ImGui::CloseCurrentPopup();
+						}
+					}
+					if (!_entity.HasComponent<DirectionalLight>())
+					{
+						if (ImGui::MenuItem("Directional Light"))
+						{
+							m_selectionContext.AddComponent<DirectionalLight>();
 							ImGui::CloseCurrentPopup();
 						}
 					}
@@ -350,6 +365,49 @@ namespace Mayhem
 					};
 
 					ImGui::DragFloat("Tiling factor", &_component.m_Tiling, 0.1f, 0.1f, 1000.f);
+				});
+
+			DrawComponent<MeshRenderer>("Mesh Renderer", _entity, [](MeshRenderer& _component)
+				{
+					ImGui::ColorEdit4("Color", glm::value_ptr(_component.m_Color));
+					std::string name;
+					if (_component.m_Texture)
+					{
+						name = _component.m_Texture->GetPath();
+						if (ImGui::Button("X"))
+							_component.m_Texture.reset();
+						ImGui::SameLine();
+					}
+					else
+						name = "None";
+
+					ImGui::InputText("Texture", (char*)name.c_str(), name.size() * sizeof(char), ImGuiInputTextFlags_ReadOnly);
+
+					if (ImGui::BeginDragDropTarget())
+					{
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+						{
+							const wchar_t* path = (const wchar_t*)payload->Data;
+
+							std::wstring ws = path;
+							std::string pathString(ws.begin(), ws.end());
+
+							_component.m_Texture = Texture2D::Create(pathString);
+
+							ImGui::EndDragDropTarget();
+						}
+
+					};
+
+					ImGui::DragFloat("Tiling factor", &_component.m_Tiling, 0.1f, 0.1f, 1000.f);
+				});
+
+			DrawComponent<DirectionalLight>("Directional Light", _entity, [](DirectionalLight& _component)
+				{
+					ImGui::ColorEdit4("Color", glm::value_ptr(_component.m_Color));
+
+					ImGui::DragFloat("Intensity", &_component.m_Intensity, 0.1f, 0.1f, 1000.f);
+					ImGui::DragFloat("Ambiant", &_component.m_Ambient, 0.1f, 0.1f, 1000.f);
 				});
 		}
 	}
