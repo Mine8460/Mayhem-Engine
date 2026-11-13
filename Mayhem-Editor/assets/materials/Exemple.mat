@@ -1,12 +1,36 @@
 Material:
   Shader: assets/shaders/Standard.glsl
-  AlbedoColor: [1, 1, 1, 1]
-  AlbedoMap: assets/textures/Checkerboard.png
-  Tiling: [1, 1]
-  Offset: [0, 0]
-  AlphaCutoff: 0.0489999987
+  ShaderID: 8634738597837798101
+  TwoSided: false
   Lit: true
-  SpecularStrength: 0.416000009
-  Shininess: 94
+  AlbedoMap: assets/textures/CheckerBox.png
+  AlbedoMapID: 3881861915807745748
+  NormalMap: ""
+  NormalMapID: 0
+  MetallicMap: ""
+  MetallicMapID: 0
+  RoughnessMap: ""
+  RoughnessMapID: 0
+  OcclusionMap: ""
+  OcclusionMapID: 0
+  HeightMap: ""
+  HeightMapID: 0
+  EmissionMap: ""
+  EmissionMapID: 0
+  AlbedoColor: [1, 1, 1, 1]
+  AlphaCutoff: 0.0680000037
+  NormalStrength: 1
+  NormalFlipY: false
+  Metallic: 0
+  MetallicChannel: 0
+  Roughness: 0
+  RoughnessChannel: 0
+  RoughnessIsSmoothness: false
+  OcclusionStrength: 1
+  OcclusionChannel: 0
+  HeightScale: 0.00800000038
+  HeightChannel: 2
   EmissionColor: [0, 0, 0]
   EmissionIntensity: 0
+  Tiling: [1, 1]
+  Offset: [0, 0]

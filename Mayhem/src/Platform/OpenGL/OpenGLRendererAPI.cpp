@@ -25,12 +25,43 @@ namespace Mayhem
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& _VA, uint32_t _iCount)
+	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& _VA, uint32_t _iCount, uint32_t _firstIndex)
 	{
 		_VA->Bind();
 
 		uint32_t count = _iCount ? _iCount : _VA->GetIndexBuffer()->GetCount();
-		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (const void*)((uintptr_t)_firstIndex * sizeof(uint32_t)));
+	}
+
+	void OpenGLRendererAPI::SetCullMode(CullMode _mode)
+	{
+		if (_mode == CullMode::None)
+		{
+			glDisable(GL_CULL_FACE);
+			return;
+		}
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(_mode == CullMode::Back ? GL_BACK : GL_FRONT);
+	}
+
+	void OpenGLRendererAPI::SetWireframe(bool _enabled)
+	{
+		if (_enabled)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			// Les arêtes sont à la même profondeur que la surface pleine déjà dessinée :
+			// LEQUAL + un léger décalage vers la caméra évitent le scintillement (z-fighting)
+			glEnable(GL_POLYGON_OFFSET_LINE);
+			glPolygonOffset(-1.0f, -1.0f);
+			glDepthFunc(GL_LEQUAL);
+		}
+		else
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glDisable(GL_POLYGON_OFFSET_LINE);
+			glDepthFunc(GL_LESS);
+		}
 	}
 
 }

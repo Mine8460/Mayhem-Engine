@@ -94,7 +94,7 @@ project "Mayhem"
 
 		defines
 		{
-			YAML_CPP_STATIC_DEFINE,
+			"YAML_CPP_STATIC_DEFINE",
 			"ENGINE_PLATFORM_WINDOWS",
 			"ENGINE_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"

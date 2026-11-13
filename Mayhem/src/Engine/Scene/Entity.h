@@ -19,7 +19,8 @@ namespace Mayhem
 		template<typename T>
 		T& GetComponent()
 		{
-			return m_Scene->m_Registry.get<T>(m_EntityHandle);
+			if (m_Scene->m_Registry.valid(m_EntityHandle))
+				return m_Scene->m_Registry.get<T>(m_EntityHandle);
 		}
 
 		std::vector<Component*> GetComponents()
@@ -27,15 +28,18 @@ namespace Mayhem
 			return m_Components;
 		}
 
-		std::vector<Entity*> GetChildrens()
-		{
-			return m_Childrens;
-		}
-
 		UUID GetUUID()
 		{
 			return GetComponent<IDComponent>().m_ID;
 		}
+
+		// ---------- Hiérarchie ----------
+		Entity GetParent();                       // entité nulle si racine
+		std::vector<Entity> GetChildren();
+		// _keepWorldTransform = true : l'objet ne bouge pas à l'écran (sa transform locale est recalculée)
+		bool SetParent(Entity _parent, bool _keepWorldTransform = true);
+		bool IsDescendantOf(Entity _ancestor);
+		glm::mat4 GetWorldTransform();
 
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args)
@@ -66,10 +70,15 @@ namespace Mayhem
 			m_Scene->m_Registry.remove<T>(m_EntityHandle);
 		}
 
+		bool IsValid() const
+		{
+			return m_Scene && m_EntityHandle != entt::null && m_Scene->m_Registry.valid(m_EntityHandle);
+		}
+
 		operator bool() const { return (uint32_t)m_EntityHandle != entt::null; }
-		bool operator==(const Entity& _other) 
-		{ 
-			return m_EntityHandle == _other.m_EntityHandle && m_Scene == _other.m_Scene; 
+		bool operator==(const Entity& _other)
+		{
+			return m_EntityHandle == _other.m_EntityHandle && m_Scene == _other.m_Scene;
 		}
 		bool operator!=(const Entity& _other)
 		{
@@ -81,7 +90,6 @@ namespace Mayhem
 
 	private:
 		std::vector<Component*> m_Components;
-		std::vector<Entity*> m_Childrens;
 
 		entt::entity m_EntityHandle{ entt::null };
 		Scene* m_Scene = nullptr;

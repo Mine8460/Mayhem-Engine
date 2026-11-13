@@ -7,15 +7,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EditorLayer.h" />
+    <ClInclude Include="src\EditorWidgets.h" />
+    <ClInclude Include="src\ThumbnailRenderer.h" />
     <ClInclude Include="src\Panels\ContentBrowserPanel.h">
       <Filter>Panels</Filter>
     </ClInclude>
     <ClInclude Include="src\Panels\SceneHierarchyPanel.h">
       <Filter>Panels</Filter>
     </ClInclude>
+    <ClInclude Include="src\UndoHistory.h" />
+    <ClInclude Include="src\ViewportIcons.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EditorLayer.cpp" />
+    <ClCompile Include="src\EditorWidgets.cpp" />
+    <ClCompile Include="src\ThumbnailRenderer.cpp" />
     <ClCompile Include="src\EngineEditorApp.cpp" />
     <ClCompile Include="src\Panels\ContentBrowserPanel.cpp">
       <Filter>Panels</Filter>
@@ -23,5 +29,7 @@
     <ClCompile Include="src\Panels\SceneHierarchyPanel.cpp">
       <Filter>Panels</Filter>
     </ClCompile>
+    <ClCompile Include="src\UndoHistory.cpp" />
+    <ClCompile Include="src\ViewportIcons.cpp" />
   </ItemGroup>
 </Project>

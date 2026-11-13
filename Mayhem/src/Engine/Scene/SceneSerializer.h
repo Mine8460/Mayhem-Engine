@@ -14,12 +14,14 @@ namespace Mayhem
 		SceneSerializer(const Ref<Scene>& _scene);
 
 		void Serialize(const std::string& _path);
+		std::string SerializeToString();
 		void SerializeRuntime(const std::string& _path);
 
 		bool Deserialize(const std::string& _path);
 		bool DeserializeRuntime(const std::string& _path);
-	private:
-		void SerializeEntity(YAML::Emitter& _out, Entity _entity);
+
+		static void SerializeEntity(YAML::Emitter& _out, Entity _entity);
+		static Entity DeserializeEntity(const YAML::Node& _node, Scene* _scene, uint64_t _uuid);
 	private:
 		Ref<Scene> m_Scene;
 	};

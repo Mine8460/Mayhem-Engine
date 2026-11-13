@@ -11,6 +11,8 @@ namespace Mayhem
 		virtual void SetViewport(uint32_t _x, uint32_t _y, uint32_t _w, uint32_t _h) override;
 		virtual void Clear(const glm::vec4& _color) override;
 
-		virtual void DrawIndexed(const Ref<VertexArray>& _VA, uint32_t _iCount = 0) override;
+		virtual void DrawIndexed(const Ref<VertexArray>& _VA, uint32_t _iCount = 0, uint32_t _firstIndex = 0) override;
+		virtual void SetCullMode(CullMode _mode) override;
+		virtual void SetWireframe(bool _enabled) override;
 	};
 }

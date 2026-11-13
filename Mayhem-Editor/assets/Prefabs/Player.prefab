@@ -1,0 +1,52 @@
+Prefab: Player
+Root: 15362186385423554973
+Entities:
+  - Entity: 15362186385423554973
+    PrefabComponent:
+      Prefab: assets/Prefabs/Player.prefab
+      PrefabID: 14032495351737234146
+    TagComponent:
+      Tag: Player
+    TransformComponent:
+      Translation: [4.9369998, 1.21472085, -5.75530624]
+      Rotation: [0, -2.22512031, 0]
+      Scale: [0.999987364, 1, 0.999987364]
+    MeshRenderer:
+      Color: [1, 1, 1, 1]
+      Material: None
+      MaterialID: 0
+      Mesh: assets/models/Capsule.fbx
+      MeshID: 17746382082082505787
+  - Entity: 10233923957422516878
+    Parent: 15362186385423554973
+    TagComponent:
+      Tag: Glasses
+    TransformComponent:
+      Translation: [0.201646328, 0.387485027, 0]
+      Rotation: [0, -0, 0]
+      Scale: [0.673850179, 0.298408687, 0.744887173]
+    MeshRenderer:
+      Color: [0, 0, 0, 1]
+      Material: None
+      MaterialID: 0
+      Mesh: assets/models/Cube.fbx
+      MeshID: 1144063750280610135
+  - Entity: 9690918620757951948
+    Parent: 10233923957422516878
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Translation: [9.53674316e-07, 9.53674316e-07, -8.34465027e-07]
+      Rotation: [-3.14158893, -1.55036378, 3.14159131]
+      Scale: [0.949780047, 1.00000024, 1.06891227]
+    CameraComponent:
+      Camera:
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicSize: 10
+        OrthographicNear: -1
+        OrthographicFar: 1
+        ProjectionType: 0
+      Primary: true
+      FixedAspectRatio: false

@@ -3,10 +3,12 @@
 #include <glm/glm.hpp>
 #include <imgui/imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
-
-#include <filesystem>
 #include <cstring>
 #include <cctype>
+#include <algorithm>
+#include "ContentBrowserPanel.h"
+#include <Engine/Scene/Prefab.h>
+#include "../EditorWidgets.h"
 
 namespace Mayhem
 {
@@ -22,32 +24,115 @@ namespace Mayhem
 		m_Context = _scene;
 	}
 
+	void SceneHierarchyPanel::SetSelectedEntity(Entity _entity)
+	{
+		m_selectionContext = _entity;
+
+		// Sélectionner une entité désélectionne l'asset : l'inspecteur montre l'entité
+		if (_entity && m_ContentBrowser)
+			m_ContentBrowser->ClearSelection();
+	}
+
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
+		// ==================== Hierarchy ====================
 		ImGui::Begin("Hierarchy");
 
-		entt::iterable_adaptor each = m_Context->m_Registry.storage<entt::entity>().each();
+		m_Pending = PendingActions();
 
-		for (auto [entity] : each)
+		// Seulement les racines : chaque entité dessine ses enfants
+		for (auto [entity] : m_Context->m_Registry.storage<entt::entity>().each())
 		{
-			DrawEntityNode({ entity, m_Context.get() });
+			Entity e{ entity, m_Context.get() };
+			if (!e.GetParent())
+				DrawEntityNode(e);
 		}
 
-		// Right - click blank space
+		if (m_HasPendingPrefab)
+		{
+			Entity parent = m_Context->GetEntityByUUID(m_PendingPrefabParent);
+			Entity instance = Prefab::Instantiate(*m_Context, m_PendingPrefabPath.lexically_normal().generic_string(), parent);
+			if (instance)
+				SetSelectedEntity(instance);
+			m_HasPendingPrefab = false;
+		}
+
+		// Lâcher une entité dans le vide = la détacher de son parent
+		if (ImGui::BeginDragDropTargetCustom(ImGui::GetCurrentWindow()->InnerRect, ImGui::GetID("##HierarchyRoot")))
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_ENTITY"))
+			{
+				m_Pending.Reparent = true;
+				m_Pending.ReparentChild = *(const uint64_t*)payload->Data;
+				m_Pending.ReparentParent = 0;
+			}
+			ImGui::EndDragDropTarget();
+			// Clic droit dans le vide
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				std::filesystem::path path = (const wchar_t*)payload->Data;
+				if (path.extension() == Prefab::Extension)
+				{
+					m_PendingPrefabPath = path;
+					m_PendingPrefabParent = 0;
+					m_HasPendingPrefab = true;
+				}
+			}
+		}
+
+
 		if (ImGui::BeginPopupContextWindow("Add entity", ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
 		{
 			if (ImGui::MenuItem("Create Empty Entity"))
-				m_Context->CreateEntity("Empty Entity");
+				SetSelectedEntity(m_Context->CreateEntity("Empty Entity"));
 
 			ImGui::EndPopup();
 		}
 
+		// ---------- Application des actions (après le parcours) ----------
+		if (m_Pending.Reparent)
+		{
+			Entity child = m_Context->GetEntityByUUID(m_Pending.ReparentChild);
+			Entity parent = m_Context->GetEntityByUUID(m_Pending.ReparentParent);
+			m_Context->SetParent(child, parent); // refusé automatiquement si ça crée une boucle
+		}
+
+		if (m_Pending.CreateChild)
+		{
+			Entity parent = m_Context->GetEntityByUUID(m_Pending.CreateChildOf);
+			Entity child = m_Context->CreateEntity("Empty Entity");
+			child.SetParent(parent, false); // position locale (0,0,0) = au centre du parent
+			SetSelectedEntity(child);
+		}
+
+		if (m_Pending.Delete)
+		{
+			if (m_selectionContext && (m_selectionContext == m_Pending.Delete || m_selectionContext.IsDescendantOf(m_Pending.Delete)))
+				m_selectionContext = Entity(entt::null, m_Context.get());
+
+			m_Context->DestroyEntity(m_Pending.Delete); // détruit aussi les enfants
+		}
+
 		ImGui::End();
 
+		// ==================== Properties ====================
 		ImGui::Begin("Properties");
-		if (m_selectionContext)
+
+		if (m_ContentBrowser && m_ContentBrowser->HasSelection())
 		{
-			DrawComponents(m_selectionContext);
+			// Asset sélectionné dans le Content Browser
+			m_ContentBrowser->DrawSelectionInspector();
+		}
+		else if (m_selectionContext)
+		{
+			// Entité sélectionnée : bandeau prefab PUIS components
+			Entity current = m_selectionContext;
+			Entity next = EditorUI::PrefabInstanceBar(current, *m_Context, m_ContentBrowser);
+			if (next != current)
+				SetSelectedEntity(next);
+
+			if (m_selectionContext)
+				DrawComponents(m_selectionContext);
 		}
 
 		ImGui::End();
@@ -55,35 +140,87 @@ namespace Mayhem
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity _entity)
 	{
-		TagComponent tag = _entity.GetComponent<TagComponent>();
+		const std::string& tag = _entity.GetComponent<TagComponent>().Tag;
+		const uint64_t uuid = (uint64_t)_entity.GetUUID();
+		std::vector<Entity> children = _entity.GetChildren();
 
-		ImGuiTreeNodeFlags selected = (m_selectionContext == _entity) ? ImGuiTreeNodeFlags_Selected : 0;
-		ImGuiTreeNodeFlags flags = selected | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)_entity, flags, tag.Tag.c_str());
-		if (ImGui::IsItemClicked())
+		ImGuiTreeNodeFlags flags = ((m_selectionContext == _entity) ? ImGuiTreeNodeFlags_Selected : 0)
+			| ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+		if (children.empty())
+			flags |= ImGuiTreeNodeFlags_Leaf; // pas de flèche si pas d'enfant
+
+		const bool inPrefab = (bool)Prefab::FindInstanceRoot(_entity);
+		if (inPrefab)
 		{
-			m_selectionContext = _entity;
+			const glm::vec4 c = EditorUI::GetPrefabColor();
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(c.r, c.g, c.b, c.a));
 		}
 
-		std::string label = "Remove Entity##" + std::to_string((uint32_t)_entity) + tag.Tag;
-		bool deleted = false;
-		if (ImGui::BeginPopupContextItem(label.c_str(), ImGuiPopupFlags_NoOpenOverExistingPopup | ImGuiPopupFlags_MouseButtonRight))
+		bool opened = ImGui::TreeNodeEx((void*)(uintptr_t)uuid, flags, "%s", tag.c_str());
+
+		if (inPrefab)
+			ImGui::PopStyleColor();
+		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+			m_selectionContext = _entity;
+
+		// Glisser cette entité...
+		if (ImGui::BeginDragDropSource())
 		{
+			uint64_t uuid = (uint64_t)_entity.GetUUID();
+			ImGui::SetDragDropPayload("SCENE_ENTITY", &uuid, sizeof(uint64_t));
+			ImGui::Text("%s", _entity.GetComponent<TagComponent>().Tag.c_str());
+			ImGui::EndDragDropSource();
+		}
+
+		// ...et la lâcher sur une autre pour en faire son enfant
+		if (ImGui::BeginDragDropTarget())
+		{
+			// Parentage : même payload que la source ci-dessus
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_ENTITY"))
+			{
+				Entity dropped = m_Context->GetEntityByUUID(*(const uint64_t*)payload->Data);
+				m_Context->SetParent(dropped, _entity); // garde ton code de parentage actuel ici
+			}
+
+			// Prefab lâché sur l'entité = instancié comme enfant
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				std::filesystem::path path = (const wchar_t*)payload->Data;
+				if (path.extension() == Prefab::Extension)
+				{
+					m_PendingPrefabPath = path;
+					m_PendingPrefabParent = (uint64_t)_entity.GetUUID();
+					m_HasPendingPrefab = true;
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Create Child Entity"))
+			{
+				m_Pending.CreateChild = true;
+				m_Pending.CreateChildOf = uuid;
+			}
+			if (_entity.GetParent() && ImGui::MenuItem("Unparent"))
+			{
+				m_Pending.Reparent = true;
+				m_Pending.ReparentChild = uuid;
+				m_Pending.ReparentParent = 0;
+			}
+			ImGui::Separator();
 			if (ImGui::MenuItem("Delete entity"))
-				deleted = true;
+				m_Pending.Delete = _entity;
 
 			ImGui::EndPopup();
 		}
 
 		if (opened)
 		{
+			for (Entity child : children)
+				DrawEntityNode(child);
 			ImGui::TreePop();
-		}
-
-		if (deleted)
-		{
-			m_Context->DestroyEntity(_entity);
-			m_selectionContext = Entity(entt::null, m_Context.get());
 		}
 	}
 
@@ -244,27 +381,29 @@ namespace Mayhem
 	}
 
 	// Slot "Material" dans un component (Sprite / Mesh Renderer)
-	static void DrawMaterialSlot(Ref<Material>& _material, std::string& _materialPath, bool _litByDefault)
+	static void DrawMaterialSlot(const char* _label, Ref<Material>& _material, std::string& _materialPath, bool _litByDefault)
 	{
 		// Chargement paresseux (scène désérialisée : seul le chemin est connu)
 		if (!_material && !_materialPath.empty())
 			_material = Material::Load(_materialPath);
+
+		ImGui::PushID(_label);
 
 		std::string name = _material
 			? std::filesystem::path(_material->GetPath()).stem().string()
 			: (_litByDefault ? "Default-Material" : "Default-Unlit");
 
 		std::string dropped;
-		switch (DrawAssetField("Material", name, _material != nullptr, { ".mat" }, dropped, _material ? _material->GetPath() : ""))
+		switch (EditorUI::AssetField(_label, name, _material != nullptr, { ".mat" }, dropped, _material ? _material->GetPath() : ""))
 		{
-		case AssetFieldResult::Dropped:
+		case EditorUI::AssetFieldResult::Dropped:
 			if (Ref<Material> mat = Material::Load(dropped))
 			{
 				_material = mat;
 				_materialPath = dropped;
 			}
 			break;
-		case AssetFieldResult::Cleared:
+		case EditorUI::AssetFieldResult::Cleared:
 			_material.reset();
 			_materialPath.clear();
 			break;
@@ -283,16 +422,21 @@ namespace Mayhem
 		}
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip("Creer un nouveau materiau dans assets/materials");
+
+		ImGui::PopID();
 	}
 
 	// Section matériau en bas de l'inspecteur (comme Unity). Sauvegarde automatique du .mat.
-	static void DrawMaterialInspector(const Ref<Material>& _material, bool _litByDefault)
+	// _slotLabel : nom du slot affiché dans l'en-tête quand le mesh a plusieurs matériaux
+	static void DrawMaterialInspector(const Ref<Material>& _material, bool _litByDefault, const std::string& _slotLabel = "")
 	{
 		const ImGuiTreeNodeFlags treeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		std::string name = _material
 			? std::filesystem::path(_material->GetPath()).stem().string()
 			: (_litByDefault ? "Default-Material" : "Default-Unlit");
+		if (!_slotLabel.empty())
+			name += "  (" + _slotLabel + ")";
 
 		ImGui::Separator();
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 4));
@@ -310,68 +454,7 @@ namespace Mayhem
 			return;
 		}
 
-		Material& mat = *_material;
-		bool save = false;
-
-		// Sauvegarde quand l'utilisateur termine une modification (relâche le slider, valide…)
-		auto saveIfEdited = [&save]() { if (ImGui::IsItemDeactivatedAfterEdit()) save = true; };
-
-		ImGui::PushID("MaterialInspector");
-
-		// ---------- Rendu ----------
-		SectionTitle("Rendu");
-		std::string dropped;
-		std::string shaderName = std::filesystem::path(mat.m_ShaderPath).filename().string();
-		switch (DrawAssetField("Shader", shaderName, !mat.m_ShaderPath.empty(), { ".glsl" }, dropped, mat.m_ShaderPath))
-		{
-		case AssetFieldResult::Dropped: mat.m_ShaderPath = dropped; save = true; break;
-		case AssetFieldResult::Cleared: mat.m_ShaderPath = Material().m_ShaderPath; save = true; break; // revient au Standard
-		default: break;
-		}
-
-		// ---------- Surface ----------
-		SectionTitle("Surface");
-		ImGui::ColorEdit4("Albedo", glm::value_ptr(mat.m_AlbedoColor));
-		saveIfEdited();
-
-		std::string albedoName = mat.m_AlbedoMapPath.empty() ? "None" : std::filesystem::path(mat.m_AlbedoMapPath).filename().string();
-		switch (DrawAssetField("Albedo Map", albedoName, !mat.m_AlbedoMapPath.empty(), { ".png", ".jpg", ".jpeg", ".tga" }, dropped, mat.m_AlbedoMapPath))
-		{
-		case AssetFieldResult::Dropped: mat.m_AlbedoMapPath = dropped; save = true; break;
-		case AssetFieldResult::Cleared: mat.m_AlbedoMapPath.clear(); save = true; break;
-		default: break;
-		}
-
-		ImGui::DragFloat2("Tiling", glm::value_ptr(mat.m_Tiling), 0.05f);
-		saveIfEdited();
-		ImGui::DragFloat2("Offset", glm::value_ptr(mat.m_Offset), 0.01f);
-		saveIfEdited();
-		ImGui::SliderFloat("Alpha Cutoff", &mat.m_AlphaCutoff, 0.0f, 1.0f);
-		saveIfEdited();
-
-		// ---------- Eclairage ----------
-		SectionTitle("Eclairage");
-		if (ImGui::Checkbox("Lit", &mat.m_Lit))
-			save = true;
-
-		// Le spéculaire n'a de sens que si le matériau est éclairé
-		if (mat.m_Lit)
-		{
-			ImGui::SliderFloat("Specular", &mat.m_SpecularStrength, 0.0f, 1.0f);
-			saveIfEdited();
-			ImGui::DragFloat("Shininess", &mat.m_Shininess, 1.0f, 1.0f, 512.0f);
-			saveIfEdited();
-		}
-
-		ImGui::ColorEdit3("Emission", glm::value_ptr(mat.m_EmissionColor));
-		saveIfEdited();
-		ImGui::DragFloat("Emission Intensity", &mat.m_EmissionIntensity, 0.05f, 0.0f, 100.0f);
-		saveIfEdited();
-
-		ImGui::PopID();
-
-		if (save)
-			mat.Save();
+		EditorUI::MaterialEditor(*_material);
 
 		ImGui::TreePop();
 	}
@@ -482,6 +565,30 @@ namespace Mayhem
 							ImGui::CloseCurrentPopup();
 						}
 					}
+					if (!_entity.HasComponent<PointLight>())
+					{
+						if (ImGui::MenuItem("Point Light"))
+						{
+							m_selectionContext.AddComponent<PointLight>();
+							ImGui::CloseCurrentPopup();
+						}
+					}
+					if (!_entity.HasComponent<SpotLight>())
+					{
+						if (ImGui::MenuItem("Spot Light"))
+						{
+							m_selectionContext.AddComponent<SpotLight>();
+							ImGui::CloseCurrentPopup();
+						}
+					}
+					if (!_entity.HasComponent<Skybox>())
+					{
+						if (ImGui::MenuItem("Skybox"))
+						{
+							m_selectionContext.AddComponent<Skybox>();
+							ImGui::CloseCurrentPopup();
+						}
+					}
 					ImGui::EndPopup();
 				}
 
@@ -573,7 +680,7 @@ namespace Mayhem
 					default: break;
 					}
 
-					DrawMaterialSlot(_component.m_Material, _component.m_MaterialPath, false);
+					DrawMaterialSlot("Material", _component.m_Material, _component.m_MaterialPath, false);
 				});
 
 			DrawComponent<MeshRenderer>("Mesh Renderer", _entity, [](MeshRenderer& _component)
@@ -595,7 +702,34 @@ namespace Mayhem
 						break;
 					}
 
-					DrawMaterialSlot(_component.m_Material, _component.m_MaterialPath, true);
+					// ---------- Slots de matériaux (un par matériau du fichier 3D) ----------
+					if (!_component.m_Mesh && !_component.m_MeshPath.empty())
+						_component.SetMesh(_component.m_MeshPath);
+
+					const uint32_t slotCount = _component.GetMaterialSlotCount();
+					if (_component.m_Materials.size() < slotCount)
+						_component.m_Materials.resize(slotCount);
+
+					SectionTitle(slotCount > 1 ? ("Materials (" + std::to_string(slotCount) + ")").c_str() : "Material");
+					for (uint32_t i = 0; i < slotCount; i++)
+					{
+						MeshRenderer::MaterialSlot& slot = _component.m_Materials[i];
+						const std::string slotName = _component.m_Mesh ? _component.m_Mesh->GetMaterialSlotName(i) : "Material";
+						const std::string label = slotCount > 1 ? std::to_string(i) + " : " + slotName : std::string("Material");
+
+						ImGui::PushID((int)i);
+						DrawMaterialSlot(label.c_str(), slot.Asset, slot.Path, true);
+						ImGui::PopID();
+					}
+
+					// Slots en trop (le mesh a changé et a moins de matériaux qu'avant)
+					if (_component.m_Mesh && _component.m_Materials.size() > slotCount)
+					{
+						ImGui::TextDisabled("%zu slot(s) inutilise(s)", _component.m_Materials.size() - slotCount);
+						ImGui::SameLine();
+						if (ImGui::SmallButton("Retirer"))
+							_component.m_Materials.resize(slotCount);
+					}
 				});
 
 			DrawComponent<DirectionalLight>("Directional Light", _entity, [](DirectionalLight& _component)
@@ -604,16 +738,75 @@ namespace Mayhem
 
 					ImGui::DragFloat("Intensity", &_component.m_Intensity, 0.05f, 0.0f, 100.f);
 					ImGui::DragFloat("Ambient", &_component.m_Ambient, 0.01f, 0.0f, 1.f);
+
+					ImGui::Checkbox("Cast Shadows", &_component.m_CastShadows);
+					if (_component.m_CastShadows)
+					{
+						ImGui::DragFloat("Shadow Distance", &_component.m_ShadowDistance, 0.5, 1.0f, 500.f);
+						ImGui::DragFloat("Shadow Bias", &_component.m_ShadowBias, 0.00001, 0.0f, 0.05f, "%.4f");
+						SectionTitle("Debug");
+						ImGui::Checkbox("Show Cascades", &_component.m_ShowCascades);
+					}
 				});
 
-			// ---------- Matériaux en bas de l'inspecteur, comme Unity ----------
-			if (_entity.HasComponent<MeshRenderer>())
-			{
-				ImGui::PushID("MeshMaterial");
-				DrawMaterialInspector(_entity.GetComponent<MeshRenderer>().m_Material, true);
-				ImGui::PopID();
-			}
+			DrawComponent<PointLight>("Point Light", _entity, [](PointLight& _component)
+				{
+					ImGui::ColorEdit3("Color", glm::value_ptr(_component.m_Color));
+					ImGui::DragFloat("Intensity", &_component.m_Intensity, 0.1f, 0.0f, 1000.f);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("1 = autant qu'un soleil d'intensite 1 a 1 m. Decroit avec le carre de la distance.");
+					ImGui::DragFloat("Range", &_component.m_Range, 0.1f, 0.1f, 1000.f, "%.1f m");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Distance ou la lumiere s'eteint completement");
 
+					ImGui::Checkbox("Cast Shadows", &_component.m_CastShadows);
+					if (_component.m_CastShadows)
+					{
+						ImGui::DragFloat("Shadow Bias", &_component.m_ShadowBias, 0.002f, 0.0f, 1.0f, "%.3f m");
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip("Monte si des rayures apparaissent sur les surfaces eclairees, baisse si l'ombre se decolle de l'objet");
+					}
+				});
+
+			DrawComponent<SpotLight>("Spot Light", _entity, [](SpotLight& _component)
+				{
+					ImGui::ColorEdit3("Color", glm::value_ptr(_component.m_Color));
+					ImGui::DragFloat("Intensity", &_component.m_Intensity, 0.1f, 0.0f, 1000.f);
+					ImGui::DragFloat("Range", &_component.m_Range, 0.1f, 0.1f, 1000.f, "%.1f m");
+					if (ImGui::SliderFloat("Spot Angle", &_component.m_OuterAngle, 1.0f, 179.0f, "%.0f deg"))
+						_component.m_InnerAngle = glm::min(_component.m_InnerAngle, _component.m_OuterAngle);
+					if (ImGui::SliderFloat("Inner Spot Angle", &_component.m_InnerAngle, 0.0f, _component.m_OuterAngle, "%.0f deg"))
+						_component.m_InnerAngle = glm::min(_component.m_InnerAngle, _component.m_OuterAngle);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Zone en pleine lumiere : au-dela, fondu jusqu'au bord du cone");
+
+					ImGui::Checkbox("Cast Shadows", &_component.m_CastShadows);
+					if (_component.m_CastShadows)
+					{
+						ImGui::DragFloat("Shadow Bias", &_component.m_ShadowBias, 0.002f, 0.0f, 1.0f, "%.3f m");
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip("Monte si des rayures apparaissent sur les surfaces eclairees, baisse si l'ombre se decolle de l'objet");
+					}
+				});
+
+			DrawComponent<Skybox>("Skybox", _entity, [](Skybox& _component)
+				{
+					ImGui::ColorEdit3("Zenith", glm::value_ptr(_component.m_ZenithColor));
+					ImGui::ColorEdit3("Horizon", glm::value_ptr(_component.m_HorizonColor));
+					ImGui::ColorEdit3("Ground", glm::value_ptr(_component.m_GroundColor));
+					ImGui::DragFloat("Sun Size", &_component.m_SunSize, 0.05f, 0.1f, 20.0f);
+					ImGui::DragFloat("Sun Glow", &_component.m_SunGlow, 0.01f, 0.0f, 5.0f);
+					ImGui::DragFloat("Exposure", &_component.m_Exposure, 0.01f, 0.0f, 5.0f);
+					ImGui::DragFloat("Environment Intensity", &_component.m_EnvironmentIntensity, 0.01f, 0.0f, 5.0f);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Force de l'eclairage ambiant et des reflets venant du ciel (IBL)");
+					SectionTitle("Gamma");
+					ImGui::Checkbox("Tone Mapping", &_component.m_ToneMapping);
+					ImGui::DragFloat("Scene Exposure", &_component.m_SceneExposure, 0.01f, 0.0f, 5.0f);
+
+				});
+
+			// ---------- Matériau du sprite en bas de l'inspecteur ----------
 			if (_entity.HasComponent<SpriteRenderer>())
 			{
 				ImGui::PushID("SpriteMaterial");

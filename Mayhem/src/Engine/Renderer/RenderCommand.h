@@ -19,9 +19,17 @@ namespace Mayhem
 		{
 			s_API->Clear(_color);
 		}
-		inline static void DrawIndexed(const Ref<VertexArray>& _VA, uint32_t _iCount = 0)
+		inline static void DrawIndexed(const Ref<VertexArray>& _VA, uint32_t _iCount = 0, uint32_t _firstIndex = 0)
 		{
-			s_API->DrawIndexed(_VA, _iCount);
+			s_API->DrawIndexed(_VA, _iCount, _firstIndex);
+		}
+		inline static void SetCullMode(RendererAPI::CullMode _mode)
+		{
+			s_API->SetCullMode(_mode);
+		}
+		inline static void SetWireframe(bool _enabled)
+		{
+			s_API->SetWireframe(_enabled);
 		}
 	private:
 		static RendererAPI* s_API;

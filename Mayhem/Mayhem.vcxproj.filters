@@ -150,6 +150,9 @@
     <ClInclude Include="src\Engine\Renderer\FrameBuffer.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Frustum.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\GraphicsContext.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
@@ -157,6 +160,12 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Mesh.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\OutlinePass.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\OverlayRenderState.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\RenderCommand.h">
@@ -180,6 +189,12 @@
     <ClInclude Include="src\Engine\Renderer\Shader.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\ShadowMap.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\EnvironmentMap.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\SubTexture2D.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
@@ -193,6 +208,9 @@
       <Filter>src\Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Entity.h">
+      <Filter>src\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Prefab.h">
       <Filter>src\Engine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Scene.h">
@@ -1550,6 +1568,12 @@
     <ClCompile Include="src\Engine\Renderer\Mesh.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\OutlinePass.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\OverlayRenderState.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\RenderCommand.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
@@ -1571,6 +1595,12 @@
     <ClCompile Include="src\Engine\Renderer\Shader.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\ShadowMap.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\EnvironmentMap.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\SubTexture2D.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
@@ -1581,6 +1611,9 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Entity.cpp">
+      <Filter>src\Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Prefab.cpp">
       <Filter>src\Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Scene.cpp">

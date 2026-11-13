@@ -1,0 +1,36 @@
+Material:
+  Shader: assets/shaders/Standard.glsl
+  ShaderID: 8634738597837798101
+  TwoSided: true
+  Lit: true
+  AlbedoMap: assets/textures/AlphaCheckerboard.png
+  AlbedoMapID: 3209051733725320513
+  NormalMap: ""
+  NormalMapID: 0
+  MetallicMap: assets/textures/CheckerBox.png
+  MetallicMapID: 3881861915807745748
+  RoughnessMap: ""
+  RoughnessMapID: 0
+  OcclusionMap: ""
+  OcclusionMapID: 0
+  HeightMap: ""
+  HeightMapID: 0
+  EmissionMap: ""
+  EmissionMapID: 0
+  AlbedoColor: [1, 1, 1, 1]
+  AlphaCutoff: 0.00999999978
+  NormalStrength: 1
+  NormalFlipY: false
+  Metallic: 0
+  MetallicChannel: 0
+  Roughness: 0.492479056
+  RoughnessChannel: 0
+  RoughnessIsSmoothness: false
+  OcclusionStrength: 1
+  OcclusionChannel: 0
+  HeightScale: 0.0299999993
+  HeightChannel: 0
+  EmissionColor: [0, 0, 0]
+  EmissionIntensity: 0
+  Tiling: [1, 1]
+  Offset: [0, 0]
